@@ -1,0 +1,112 @@
+:root {
+    --fff-bleu: #002350;
+    --fff-rouge: #E30613;
+    --bg-dark: #0a0e17;
+    --card-bg: #111827;
+    --border: #1f2937;
+    --text: #f3f4f6;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+}
+
+/* NAVBAR */
+.navbar { background-color: #000 !important; border-bottom: 3px solid var(--fff-rouge); }
+
+/* BACKGROUND LOGIN AVEC IMAGE */
+.login-page-wrapper {
+    /* Remplace 'mon_super_bg.jpg' par le nom exact de ton fichier */
+    background-image: linear-gradient(rgba(0, 35, 80, 0.7), rgba(0, 0, 0, 0.8)), url('../img/Gemini_Generated_Image_yh6jgyh6jgyh6jgy.png');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+/* CARD LOOK "FFF" */
+.card-knockout {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    border-top: 6px solid var(--fff-bleu);
+    color: #000;
+}
+
+/* DASHBOARD GRID + SIDEBAR */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+}
+
+.match-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.score-input {
+    width: 60px; height: 50px;
+    background: #1f2937; color: #fff;
+    border: 1px solid var(--border);
+    text-align: center; font-size: 1.5rem; font-weight: bold;
+    border-radius: 8px;
+}
+
+.sidebar {
+    background: var(--card-bg);
+    padding: 20px; border-radius: 12px;
+    height: fit-content; position: sticky; top: 20px;
+}
+
+/* La carte blanche de connexion */
+.card-knockout {
+    background-color: #FFFFFF;
+    border-radius: 12px;
+    position: relative; /* Très important pour le cadre */
+    z-index: 1; /* Garde le contenu au-dessus */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6); /* Ombre pour détacher la carte du fond */
+}
+
+/* Le cadre Bleu-Blanc-Rouge (placé derrière la carte blanche) */
+.card-knockout::before {
+    content: "";
+    position: absolute;
+    /* On décale de -4px de chaque côté pour faire l'épaisseur de la bordure */
+    top: -4px; 
+    left: -4px; 
+    right: -4px; 
+    bottom: -4px;
+    border-radius: 16px; /* Arrondi légèrement plus grand pour épouser la carte */
+    
+    /* Le dégradé du drapeau français (Bleu -> Blanc -> Rouge) */
+    background: linear-gradient(135deg, #002654 0%, #FFFFFF 50%, #ED2939 100%);
+    
+    z-index: -1; /* Place cette bordure sous la carte blanche */
+}
+
+/* Ton bouton rouge (si tu ne l'avais pas encore mis) */
+.btn-fff-rouge {
+    background-color: #9b0014;
+    color: white;
+    border: none;
+    border-radius: 6px;
+}
+.btn-fff-rouge:hover {
+    background-color: #7a0010;
+    color: white;
+}
+
+/* Personnalisation des champs de texte (Email, Mot de passe) */
+.form-control:focus {
+    /* Change la couleur de la bordure en doré */
+    border-color: #D4AF37; 
+    
+    /* Remplace le halo bleu par défaut de Bootstrap par un halo doré transparent */
+    box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25); 
+}

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-5" style="min-height: calc(100vh - 150px);">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold text-white text-uppercase" style="letter-spacing: 2px;">Classement Général</h1>
+        <p class="text-light opacity-75 mt-2">La compétition est rude. Seuls les meilleurs pronostiqueurs domineront.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg bg-dark" style="border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1) !important;">
+                
+                <table class="table table-dark table-hover mb-0 text-center align-middle border-dark">
+                    <thead style="background: rgba(255,255,255,0.05);">
+                        <tr>
+                            <th class="py-4 text-light opacity-50 text-uppercase fs-6 border-0">Rang</th>
+                            <th class="py-4 text-light opacity-50 text-uppercase fs-6 text-start border-0">Joueur</th>
+                            <th class="py-4 text-light opacity-50 text-uppercase fs-6 border-0">Points</th>
+                        </tr>
+                    </thead>
+                    <tbody style="border-top: none;">
+                        {% for user in users %}
+                        <tr style="transition: all 0.2s;">
+                            
+                            <td class="py-4 border-0">
+                                {% if loop.index == 1 %}
+                                    <div class="d-inline-block rounded-circle bg-warning text-dark fw-bold shadow" style="width: 40px; height: 40px; line-height: 40px; font-size: 1.2rem;">1</div>
+                                {% elif loop.index == 2 %}
+                                    <div class="d-inline-block rounded-circle text-dark fw-bold shadow" style="width: 40px; height: 40px; line-height: 40px; font-size: 1.2rem; background-color: #e2e8f0;">2</div>
+                                {% elif loop.index == 3 %}
+                                    <div class="d-inline-block rounded-circle text-white fw-bold shadow" style="width: 40px; height: 40px; line-height: 40px; font-size: 1.2rem; background-color: #cd7f32;">3</div>
+                                {% else %}
+                                    <div class="fw-bold fs-5 text-light opacity-50">{{ loop.index }}</div>
+                                {% endif %}
+                            </td>
+                            
+                            <td class="py-4 fw-bold fs-5 text-white text-start border-0">
+                                {{ user.pseudo }}
+                                {% if loop.index == 1 %} <span class="ms-2 fs-6">👑</span> {% endif %}
+                            </td>
+                            
+                            <td class="py-4 fw-bold fs-4 border-0" style="color: #ed2939;">
+                                {{ user.points_totaux }} <span class="fs-6 text-light opacity-50 fw-normal">pts</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

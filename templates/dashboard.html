@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="position-fixed top-0 end-0 p-4" style="z-index: 1050;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show shadow-lg" role="alert" style="border-radius: 10px; font-weight: bold; background-color: #d1e7dd; color: #0f5132; border: 1px solid #badbcc;">
+            ✅ {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+</div>
+    <main>
+        <h2 class="mb-4 text-uppercase fw-bold">Mes Pronostics</h2>
+        
+        {% set current_phase = "" %}
+            
+            {% for match in matchs %}
+                
+                {% if match.phase != current_phase %}
+                    {% set current_phase = match.phase %}
+                    <h3 class="fw-bold text-white mt-5 mb-4 text-uppercase" style="border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                        🏆 {{ match.phase }}
+                    </h3>
+                {% endif %}
+
+                {% set is_locked = false %}
+                {% if 'Huitièmes' in match.phase and not unlocked.huitiemes %} {% set is_locked = true %} {% endif %}
+                {% if 'Quarts' in match.phase and not unlocked.quarts %} {% set is_locked = true %} {% endif %}
+                {% if 'Demi' in match.phase and not unlocked.demis %} {% set is_locked = true %} {% endif %}
+                {% if ('Finale' in match.phase or 'Petite' in match.phase) and not unlocked.finale %} {% set is_locked = true %} {% endif %}
+
+                <div class="card mb-3 border-0 shadow-sm" style="background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px); border-radius: 12px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'">
+                    <div class="card-body py-3 px-4 d-flex align-items-center justify-content-between">
+                        
+                        <div style="width: 15%; border-right: 1px solid rgba(255,255,255,0.1);">
+                            <span class="text-light opacity-50 small d-block">{{ match.date }}</span>
+                            <span class="fw-bold fs-5" style="color: #4facfe;">{{ match.heure }}</span>
+                        </div>
+                        
+                        {% if is_locked %}
+                            <div class="d-flex justify-content-center align-items-center flex-grow-1">
+                                <span class="fw-bold text-muted fs-5 me-3 fst-italic">À définir</span>
+                                <span class="fs-4">❓</span>
+                                <span class="badge px-3 py-2 mx-4" style="background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3);">EN ATTENTE</span>
+                                <span class="fs-4">❓</span>
+                                <span class="fw-bold text-muted fs-5 ms-3 fst-italic">À définir</span>
+                            </div>
+                            <button class="btn btn-secondary disabled" style="width: 80px;">🔒</button>
+
+                        {% else %}
+                            <form method="POST" action="/dashboard" class="d-flex align-items-center justify-content-between flex-grow-1 ms-3">
+                                <input type="hidden" name="match_id" value="{{ match.id }}">
+                                
+                                <div class="d-flex align-items-center justify-content-end" style="width: 35%;">
+                                    <span class="fw-bold text-white fs-5 me-3">{{ match.eq1 }}</span>
+                                    <img src="{{ match.logo1 }}" width="35" style="border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
+                                </div>
+                                
+                                <div class="d-flex align-items-center justify-content-center" style="width: 30%;">
+                                    {% if match.statut == 'Terminé' %}
+                                        <span class="badge bg-danger fs-5 px-3 py-2">Score Final : {{ match.vrai_score_eq1 }} - {{ match.vrai_score_eq2 }}</span>
+                                    {% else %}
+                                        <input type="number" name="score1" value="{{ match.prono_score_eq1 if match.prono_score_eq1 is not none else '' }}" class="form-control text-center mx-2 fw-bold bg-dark text-white border-secondary" style="width: 60px;" min="0" required>
+                                        <span class="fs-5 text-white opacity-50">-</span>
+                                        <input type="number" name="score2" value="{{ match.prono_score_eq2 if match.prono_score_eq2 is not none else '' }}" class="form-control text-center mx-2 fw-bold bg-dark text-white border-secondary" style="width: 60px;" min="0" required>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="d-flex align-items-center justify-content-start" style="width: 35%;">
+                                    <img src="{{ match.logo2 }}" width="35" style="border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
+                                    <span class="fw-bold text-white fs-5 ms-3">{{ match.eq2 }}</span>
+                                </div>
+
+                                {% if match.statut != 'Terminé' %}
+                                    <button type="submit" class="btn btn-success fw-bold ms-3" style="width: 80px; box-shadow: 0 4px 10px rgba(25, 135, 84, 0.4);">OK</button>
+                                {% else %}
+                                    <div style="width: 80px;" class="ms-3"></div> {% endif %}
+                            </form>
+                        {% endif %}
+
+                    </div>
+                </div>
+            {% endfor %}
+        
+    </main>
+    
+    <aside class="sidebar p-4" style="background: #1a1a2e; border-radius: 10px;">
+        <h4 class="fw-bold mb-4 text-white">RÉCAPITULATIF</h4>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <span class="text-light">Points Totaux</span>
+            <span class="badge bg-primary fs-5 px-3 py-2">{{ points }} PTS</span>
+        </div>
+        <a href="/ranking" class="btn btn-outline-light w-100 fw-bold">Voir le classement</a>
+    </aside>
+</div>
+{% endblock %}

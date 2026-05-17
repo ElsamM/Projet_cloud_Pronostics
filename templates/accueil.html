@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+<style>
+    /* LE FOND DYNAMIQUE PREMIUM */
+    .pro-bg {
+        background: linear-gradient(135deg, #050a15 0%, #0a1128 50%, #111a3a 100%);
+        background-size: 400% 400%;
+        animation: proGradient 15s ease infinite;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+    @keyframes proGradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* LE GLASSMORPHISM AMÉLIORÉ (Plus brillant, plus "pro") */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 24px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s ease;
+    }
+    .glass-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    /* TEXTES EN DÉGRADÉ (Avec correctif VS Code) */
+    .text-gradient-red {
+        background: linear-gradient(90deg, #ed2939, #ff5e62);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+    }
+    .text-gradient-blue {
+        background: linear-gradient(90deg, #4facfe, #00f2fe);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+    }
+
+    /* Effet néon pour les compteurs */
+    .neon-number {
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    }
+
+    /* Le défilement infini des drapeaux */
+    .marquee-container {
+        overflow: hidden;
+        white-space: nowrap;
+        background: rgba(0,0,0,0.4);
+        padding: 30px 0;
+        border-top: 1px solid rgba(255,255,255,0.05);
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .marquee-content {
+        display: inline-block;
+        animation: marquee 25s linear infinite;
+    }
+    .marquee-content img { height: 45px; margin: 0 40px; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+    @keyframes marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
+</style>
+
+<div style="position: relative; height: 100vh; width: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-top: -90px;">
+    <video autoplay loop muted playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; filter: brightness(0.35);">
+        <source src="{{ url_for('static', filename='video/trailler.mp4') }}" type="video/mp4">
+    </video>
+    <div style="position: relative; z-index: 1; text-align: center; padding-top: 90px;">
+        <h1 class="fw-bold text-white text-uppercase" style="font-size: 5rem; letter-spacing: -2px;" data-aos="zoom-out" data-aos-duration="1200">World Cup 2026</h1>
+        <p class="text-light mt-3" style="font-size: 1.5rem; font-weight: 300;" data-aos="fade-up" data-aos-delay="400">La plus grande compétition de l'histoire.</p>
+        <a href="/dashboard" class="btn mt-5 px-5 py-3 rounded-pill fw-bold shadow-lg text-white" style="background-color: #ed2939; font-size: 1.2rem; transition: transform 0.2s;" data-aos="fade-up" data-aos-delay="700" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">FAIRE MES PRONOSTICS</a>
+    </div>
+    <div style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); animation: bounce 2s infinite;" data-aos="fade-in" data-aos-delay="1500">
+        <span class="text-white opacity-50 fs-3">↓</span>
+    </div>
+</div>
+<style> @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0) translateX(-50%);} 40% {transform: translateY(-15px) translateX(-50%);} 60% {transform: translateY(-7px) translateX(-50%);} } </style>
+
+<div class="pro-bg pt-5 pb-5">
+    
+    <div class="container my-5" id="stats-section">
+        
+        <div class="row align-items-center mb-5 pb-5">
+            <div class="col-md-5" data-aos="fade-right" data-aos-duration="1000">
+                <h2 class="fw-bold text-gradient-red" style="font-size: 3.5rem; letter-spacing: -1px;">Un Format Inédit</h2>
+                <p class="text-light fs-5 mt-4" style="opacity: 0.85; line-height: 1.8;">
+                    L'Amérique du Nord accueille une compétition historique. Oubliez tout ce que vous saviez : ce ne sont plus 32 mais <strong class="text-white">48 nations</strong> qui s'affronteront. La route vers la finale sera plus longue, plus tactique, et plus intense.
+                </p>
+            </div>
+            
+            <div class="col-md-7" data-aos="fade-left" data-aos-duration="1000">
+                <div class="glass-card p-4 d-flex justify-content-evenly align-items-center" style="background: rgba(0, 38, 84, 0.2);">
+                    <div class="text-center px-4">
+                        <h1 class="fw-bold text-white mb-0 neon-number" style="font-size: 4.5rem;" id="counter-48">0</h1>
+                        <h6 class="text-white opacity-50 text-uppercase tracking-widest mt-2 fw-bold" style="letter-spacing: 2px;">Équipes</h6>
+                    </div>
+                    
+                    <div style="width: 2px; background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.3), transparent); height: 100px;"></div>
+                    
+                    <div class="text-center px-4">
+                        <h1 class="fw-bold text-white mb-0 neon-number" style="font-size: 4.5rem;" id="counter-104">0</h1>
+                        <h6 class="text-white opacity-50 text-uppercase tracking-widest mt-2 fw-bold" style="letter-spacing: 2px;">Matchs</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row align-items-stretch mt-5 flex-row-reverse">
+            <div class="col-md-7 mb-4 mb-md-0" data-aos="fade-left" data-aos-duration="1000">
+                <div class="glass-card p-5 h-100">
+                    <h2 class="fw-bold text-gradient-blue mb-5" style="font-size: 2.5rem;">Comment marquer ?</h2>
+                    
+                    <div class="d-flex align-items-center mb-4 p-3 rounded-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                        <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-4 shadow" style="width: 55px; height: 55px; flex-shrink: 0; font-size: 1.3rem; font-weight: 800;">+3</div>
+                        <div>
+                            <h5 class="text-white fw-bold mb-1">Score Parfait</h5>
+                            <p class="text-light opacity-75 mb-0 fs-6">Vous avez deviné l'issue exacte du match. Un coup de maître.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-4 p-3 rounded-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                        <div class="bg-info text-dark rounded-circle d-flex align-items-center justify-content-center me-4 shadow" style="width: 55px; height: 55px; flex-shrink: 0; font-size: 1.3rem; font-weight: 800;">+1</div>
+                        <div>
+                            <h5 class="text-white fw-bold mb-1">Bonne Tendance</h5>
+                            <p class="text-light opacity-75 mb-0 fs-6">Vous avez trouvé le bon vainqueur (ou le nul), mais pas le bon score.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center p-3 rounded-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                        <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-4 shadow" style="width: 55px; height: 55px; flex-shrink: 0; font-size: 1.3rem; font-weight: 800;">0</div>
+                        <div>
+                            <h5 class="text-white fw-bold mb-1">Pari Perdu</h5>
+                            <p class="text-light opacity-75 mb-0 fs-6">L'équipe choisie a perdu. Votre intuition vous a trahi.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-5" data-aos="fade-right" data-aos-duration="1000">
+                <div class="glass-card p-5 h-100 d-flex flex-column justify-content-center position-relative overflow-hidden" style="border-top: 4px solid #ed2939;">
+                    <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(237, 41, 57, 0.2); filter: blur(50px); border-radius: 50%; z-index: 0;"></div>
+                    
+                    <div style="position: relative; z-index: 1;">
+                        <h3 class="fw-bold text-white mb-4">Votre Mission 🎯</h3>
+                        <p class="text-light mb-4" style="opacity: 0.85; line-height: 1.8;">
+                            L'instinct ne suffit plus. Analysez les statistiques, anticipez les surprises et défiez la communauté de l'ESME. <br><br>
+                            Chaque but à la 90ème minute peut bouleverser le classement. Serez-vous le grand tacticien de cette édition ?
+                        </p>
+                        <a href="/dashboard" class="btn btn-outline-light w-100 rounded-pill fw-bold py-3 mt-2" style="border-width: 2px;">RELEVER LE DÉFI</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5 pt-5 mb-3">
+        <h4 class="text-center text-white fw-bold text-uppercase mb-4" style="letter-spacing: 3px;" data-aos="fade-up">Les Nations Qualifiées</h4>
+        <div class="marquee-container shadow-lg">
+            <div class="marquee-content">
+                <img src="https://media.api-sports.io/football/teams/2.png" alt="France">
+                <img src="https://media.api-sports.io/football/teams/26.png" alt="Argentine">
+                <img src="https://media.api-sports.io/football/teams/6.png" alt="Brésil">
+                <img src="https://media.api-sports.io/football/teams/31.png" alt="Maroc">
+                <img src="https://media.api-sports.io/football/teams/10.png" alt="Angleterre">
+                <img src="https://media.api-sports.io/football/teams/9.png" alt="Espagne">
+                <img src="https://media.api-sports.io/football/teams/1.png" alt="Belgique">
+                <img src="https://media.api-sports.io/football/teams/25.png" alt="Allemagne">
+                <img src="https://media.api-sports.io/football/teams/2.png" alt="France">
+                <img src="https://media.api-sports.io/football/teams/26.png" alt="Argentine">
+                <img src="https://media.api-sports.io/football/teams/6.png" alt="Brésil">
+                <img src="https://media.api-sports.io/football/teams/31.png" alt="Maroc">
+                <img src="https://media.api-sports.io/football/teams/10.png" alt="Angleterre">
+                <img src="https://media.api-sports.io/football/teams/9.png" alt="Espagne">
+                <img src="https://media.api-sports.io/football/teams/1.png" alt="Belgique">
+                <img src="https://media.api-sports.io/football/teams/25.png" alt="Allemagne">
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init(); 
+
+    // Fonction Magique pour animer les chiffres
+    function animateCounter(id, start, end, duration) {
+        let obj = document.getElementById(id);
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.innerHTML = Math.floor(progress * (end - start) + start);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // Observer pour déclencher au scroll
+    let observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                animateCounter("counter-104", 0, 104, 2000); 
+                animateCounter("counter-48", 0, 48, 1500);  
+                observer.unobserve(entry.target); 
+            }
+        });
+    }, { threshold: 0.5 }); 
+
+    observer.observe(document.getElementById("stats-section"));
+</script>
+
+{% endblock %}

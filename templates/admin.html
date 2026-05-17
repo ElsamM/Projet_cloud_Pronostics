@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-uppercase fw-bold text-danger">Panneau d'Administration</h2>
+        <a href="/dashboard" class="btn btn-outline-light rounded-pill px-3">Retour au Dashboard</a>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert alert-success shadow-sm mb-4" style="border-radius: 8px;">
+        {% for message in messages %}
+          <span class="fw-bold">{{ message }}</span>
+        {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <h4 class="mb-4 text-muted">Gestion des résultats des matchs</h4>
+            
+            {% for match in matchs %}
+            <div class="card p-4 mb-3 border-0 shadow-sm" style="background: rgba(255, 255, 255, 0.03); border-radius: 12px;">
+                <div class="row align-items-center">
+                    
+                    <div class="col-md-3">
+                        <span class="text-muted small d-block">{{ match.date }} - {{ match.heure }}</span>
+                        <span class="badge bg-secondary mt-1">{{ match.phase }}</span>
+                        {% if match.statut == 'Terminé' %}
+                            <span class="badge bg-success mt-1">Validé</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark mt-1">En attente</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-9">
+                        {% if match.statut == 'Terminé' %}
+                            <div class="d-flex align-items-center justify-content-center fs-4 fw-bold text-white">
+                                <span class="me-4">{{ match.eq1 }}</span>
+                                <span class="badge bg-dark px-3 py-2 fs-5">{{ match.vrai_score_eq1 }} - {{ match.vrai_score_eq2 }}</span>
+                                <span class="ms-4">{{ match.eq2 }}</span>
+                            </div>
+                        {% else %}
+                            <form method="POST" action="/admin" class="d-flex align-items-center justify-content-between w-100">
+                                <input type="hidden" name="match_id" value="{{ match.id }}">
+                                
+                                <div class="fw-bold text-end" style="width: 30%;">{{ match.eq1 }}</div>
+                                
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <input type="number" name="vrai_score1" class="form-control text-center mx-2 fw-bold" style="width: 70px; background-color: #f4f6f8;" min="0" required>
+                                    <span class="fs-4 text-white mx-2">-</span>
+                                    <input type="number" name="vrai_score2" class="form-control text-center mx-2 fw-bold" style="width: 70px; background-color: #f4f6f8;" min="0" required>
+                                </div>
+                                
+                                <div class="fw-bold text-start" style="width: 30%;">{{ match.eq2 }}</div>
+                                
+                                <button type="submit" class="btn btn-danger fw-bold shadow-sm px-4">Valider le score</button>
+                            </form>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info">Aucun match enregistré dans le système.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

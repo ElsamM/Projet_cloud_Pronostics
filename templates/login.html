@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    .bg-texture {
+        background-image: url("{{ url_for('static', filename='img/Gemini_Generated_Image_yh6jgyh6jgy.png') }}");
+        background-size: cover;
+        background-position: center;
+        min-height: calc(100vh - 90px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+</style>
+
+<div class="bg-texture">
+    
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 15, 40, 0.5); z-index: 0;"></div>
+
+    <div class="card p-5 text-center shadow-lg" style="width: 100%; max-width: 420px; border-radius: 16px; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); border: none; position: relative; z-index: 1;">
+        
+        <img src="{{ url_for('static', filename='img/Logo_Équipe_France_Football_Maillot_2024.svg.png') }}" alt="Logo FFF" style="height: 70px; margin: 0 auto 20px auto; object-fit: contain;">
+        
+        <h3 class="fw-bold mb-4" style="color: #002654; letter-spacing: -0.5px;">Connexion</h3>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="alert alert-danger p-2 mb-4" style="border-radius: 8px; font-size: 0.9rem; border: none; background-color: #ffe5e5; color: #d63031;">
+            {% for message in messages %}
+              <strong>{{ message }}</strong>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/login" class="text-start">
+            <div class="mb-3">
+                <label class="form-label text-muted small fw-bold mb-1">Adresse Email</label>
+                <input type="email" class="form-control" name="email" required style="border-radius: 8px; padding: 12px 16px; font-size: 15px; background-color: #f4f6f8; border: 1px solid #e1e5eb;">
+            </div>
+            <div class="mb-4">
+                <label class="form-label text-muted small fw-bold mb-1">Mot de passe</label>
+                <input type="password" class="form-control" name="password" required style="border-radius: 8px; padding: 12px 16px; font-size: 15px; background-color: #f4f6f8; border: 1px solid #e1e5eb;">
+            </div>
+            
+            <button type="submit" class="btn w-100 fw-bold text-white mb-4" style="background-color: #002654; border-radius: 8px; padding: 14px; font-size: 1.1rem; border: none; transition: background-color 0.3s;">
+                Se connecter
+            </button>
+        </form>
+        
+        <p class="text-muted mb-0" style="font-size: 14px;">Pas encore de compte ? <a href="/register" class="text-decoration-none fw-bold" style="color: #ed2939;">S'inscrire</a></p>
+        
+    </div>
+</div>
+
+{% endblock %}
