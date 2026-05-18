@@ -36,7 +36,7 @@
                             </td>
                             
                             <td class="py-4 fw-bold fs-5 text-white text-start border-0">
-                                {{ user.pseudo }}
+                                {{ user.nom | upper }} {{ user.prenom }}
                                 {% if loop.index == 1 %} <span class="ms-2 fs-6">👑</span> {% endif %}
                             </td>
                             

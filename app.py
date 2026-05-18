@@ -29,6 +29,9 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        # MODIFICATION : On récupère le nom et le prénom depuis le formulaire HTML
+        nom = request.form['nom']
+        prenom = request.form['prenom']
         email = request.form['email']
         pw = request.form['password']
         pw_c = request.form['password_confirm']
@@ -43,8 +46,9 @@ def register():
         else:
             conn = get_db_connection()
             try:
-                conn.execute('INSERT INTO Utilisateurs (pseudo, email, mot_de_passe_hash) VALUES (?, ?, ?)', 
-                             (pseudo, email, generate_password_hash(pw)))
+                # MODIFICATION : On insère nom et prenom dans la base de données
+                conn.execute('INSERT INTO Utilisateurs (nom, prenom, pseudo, email, mot_de_passe_hash) VALUES (?, ?, ?, ?, ?)', 
+                             (nom, prenom, pseudo, email, generate_password_hash(pw)))
                 conn.commit()
                 flash("Compte créé avec succès ! Connectez-vous.", "success")
                 return redirect(url_for('login'))
@@ -53,6 +57,7 @@ def register():
             finally: 
                 conn.close()
     return render_template('register.html')
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -123,6 +128,7 @@ def dashboard():
     
     # On envoie les infos de déverrouillage au HTML !
     return render_template('dashboard.html', matchs=matchs, points_totaux=points_totaux, unlocked=unlocked)
+
 @app.route('/calendrier')
 def calendrier():
     if 'user_id' not in session: return redirect(url_for('login'))
@@ -144,15 +150,21 @@ def calendrier():
 @app.route('/ranking')
 def ranking():
     conn = get_db_connection()
-    # CORRECTION ICI : On sélectionne "pseudo" et pas "email"
+    # MODIFICATION ICI : On sélectionne "nom" et "prenom" pour le classement des vrais joueurs
     users = conn.execute('''
-        SELECT pseudo, points_totaux 
+        SELECT nom, prenom, points_totaux 
         FROM Utilisateurs 
         WHERE email != 'admin@esme.fr' 
         ORDER BY points_totaux DESC
     ''').fetchall()
     conn.close()
     return render_template('ranking.html', users=users)
+
+# NOUVELLE ROUTE : Règlements ATNIL
+@app.route('/reglement')
+def reglement():
+    return render_template('reglement.html')
+
 @app.route('/logout')
 def logout():
     session.clear()

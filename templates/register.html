@@ -40,14 +40,27 @@
         {% endwith %}
 
         <form method="POST" action="/register" class="text-start">
+            
+            <div class="mb-3">
+                <label class="form-label text-muted small fw-bold mb-1">Nom</label>
+                <input type="text" class="form-control" name="nom" required style="border-radius: 8px; padding: 12px 16px; font-size: 15px; background-color: #f4f6f8; border: 1px solid #e1e5eb;">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label text-muted small fw-bold mb-1">Prénom</label>
+                <input type="text" class="form-control" name="prenom" required style="border-radius: 8px; padding: 12px 16px; font-size: 15px; background-color: #f4f6f8; border: 1px solid #e1e5eb;">
+            </div>
+
             <div class="mb-3">
                 <label class="form-label text-muted small fw-bold mb-1">Adresse Email</label>
                 <input type="email" class="form-control" name="email" required style="border-radius: 8px; padding: 12px 16px; font-size: 15px; background-color: #f4f6f8; border: 1px solid #e1e5eb;">
             </div>
+            
             <div class="mb-3">
                 <label class="form-label text-muted small fw-bold mb-1">Mot de passe (8 car. min)</label>
                 <input type="password" class="form-control" name="password" required minlength="8" style="border-radius: 8px; padding: 12px 16px; font-size: 15px; background-color: #f4f6f8; border: 1px solid #e1e5eb;">
             </div>
+            
             <div class="mb-4">
                 <label class="form-label text-muted small fw-bold mb-1">Confirmer le mot de passe</label>
                 <input type="password" class="form-control" name="password_confirm" required minlength="8" style="border-radius: 8px; padding: 12px 16px; font-size: 15px; background-color: #f4f6f8; border: 1px solid #e1e5eb;">

@@ -3,11 +3,13 @@ DROP TABLE IF EXISTS Matchs;
 DROP TABLE IF EXISTS Equipes;
 DROP TABLE IF EXISTS Utilisateurs;
 
-CREATE TABLE Utilisateurs (
+CREATE TABLE IF NOT EXISTS Utilisateurs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    pseudo TEXT UNIQUE NOT NULL, -- LA NOUVELLE COLONNE EST ICI
-    email TEXT UNIQUE NOT NULL,
-    mot_de_passe_hash TEXT NOT NULL,
+    nom TEXT NOT NULL,
+    prenom TEXT NOT NULL,
+    pseudo TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    mot_de_passe TEXT NOT NULL,
     points_totaux INTEGER DEFAULT 0
 );
 
