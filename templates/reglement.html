@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5 pt-4 mb-5" style="min-height: calc(100vh - 150px);">
+    <div class="card border-0 shadow-lg p-5" style="background: rgba(0, 15, 40, 0.9); backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1) !important;">
+        <h1 class="fw-bold text-white mb-4 border-bottom border-secondary pb-3">Règlements & RGPD</h1>
+        
+        <h4 class="text-info fw-bold mt-4">1. Règles du jeu</h4>
+        <p class="text-light opacity-75">
+            - Bon score exact : 3 points.<br>
+            - Bonne issue du match (vainqueur ou nul) : 1 point.<br>
+            - Mauvais pronostic : 0 point.
+        </p>
+
+        <h4 class="text-info fw-bold mt-5">2. Déclaration CNIL et Protection des Données (RGPD)</h4>
+        <div class="p-4 bg-dark rounded border border-secondary text-light opacity-75">
+            <p><em>[RGPD :
+Les données transmises via ce formulaire sont utilisées uniquement pour répondre au fonctionnement du site. Il s'agit du nom, prénom, mail, mot de passe. Elles sont conservées pendant la durée nécessaire au traitement puis supprimées à la fin de la coupe du monde 2026. Pour toute question ou demande de suppression, contactez mbx_syndicat_cftc@bouyguestelecom.fr]</em></p>
+            <p>Conformément au Règlement Général sur la Protection des Données (RGPD), les informations recueillies (Nom, Prénom, Email) sont strictement utilisées dans le cadre de ce concours de pronostics...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

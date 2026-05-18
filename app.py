@@ -234,5 +234,22 @@ def admin():
     conn.close()
     return render_template('admin.html', matchs=matchs)
 
+@app.route('/profil')
+def profil():
+    if 'user_id' not in session: return redirect(url_for('login'))
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM Utilisateurs WHERE id = ?', (session['user_id'],)).fetchone()
+    conn.close()
+    return render_template('profil.html', user=user)
+
+@app.route('/preferences')
+def preferences():
+    if 'user_id' not in session: return redirect(url_for('login'))
+    return render_template('preferences.html')
+@app.route('/reglement')
+def reglement():
+    # En attendant le texte du prof, tu peux mettre un "Lorem Ipsum"
+    return render_template('reglement.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

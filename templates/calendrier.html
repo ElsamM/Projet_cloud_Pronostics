@@ -8,63 +8,80 @@
         <p class="text-light opacity-75 fs-5 mt-3">Toutes les rencontres, de la phase de groupes à la grande Finale.</p>
     </div>
 
-    <div class="row justify-content-center">
-        <div class="col-md-10">
+    <div class="accordion accordion-flush shadow-lg" id="accordionMatchs">
+        
+        {% for phase, liste_matchs in matchs|groupby('phase') %}
+        <div class="accordion-item mb-3 rounded-4 overflow-hidden" style="background: rgba(0, 15, 40, 0.6); border: 1px solid rgba(255,255,255,0.1);">
             
-            {% set current_phase = "" %}
+            <h2 class="accordion-header">
+                <button class="accordion-button {% if not loop.first %}collapsed{% endif %} fw-bold fs-4 text-white" 
+                        type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#collapse{{ loop.index }}"
+                        style="background: linear-gradient(90deg, #1e3a8a, transparent); box-shadow: none;">
+                    🏆 {{ phase|upper }}
+                </button>
+            </h2>
             
-            {% for match in matchs %}
-                
-                {% if match.phase != current_phase %}
-                    {% set current_phase = match.phase %}
-                    <h3 class="fw-bold text-white mt-5 mb-4 text-uppercase" style="border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 10px; letter-spacing: 1px;">
-                        🏆 {{ match.phase }}
-                    </h3>
-                {% endif %}
-                
-                {% set is_poule = ('Journée' in match.phase) %}
-                
-                <div class="card mb-3 border-0 shadow-sm" style="background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px); border-radius: 12px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'">
-                    <div class="card-body py-3 px-4 d-flex align-items-center justify-content-between">
-                        
-                        <div style="width: 15%; border-right: 1px solid rgba(255,255,255,0.1);">
-                            <span class="fw-bold fs-5" style="color: #4facfe;">{{ match.heure }}</span>
-                        </div>
-                        
-                        <div class="d-flex justify-content-end align-items-center" style="width: 35%;">
-                            {% if is_poule %}
-                                <span class="fw-bold text-white fs-5 me-3">{{ match.eq1 }}</span>
-                                <img src="{{ match.logo1 }}" width="35" style="border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
-                            {% else %}
-                                <span class="fw-bold text-muted fs-5 me-3 fst-italic">À définir</span>
-                                <span class="fs-4">❓</span>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="text-center" style="width: 15%;">
-                            {% if match.statut == 'Terminé' %}
-                                <span class="badge bg-danger fs-5 px-3 py-2">{{ match.vrai_score_eq1 }} - {{ match.vrai_score_eq2 }}</span>
-                            {% else %}
-                                <span class="badge px-3 py-2" style="background: rgba(255,255,255,0.1); color: #fff;">VS</span>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="d-flex justify-content-start align-items-center" style="width: 35%;">
-                            {% if is_poule %}
-                                <img src="{{ match.logo2 }}" width="35" style="border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
-                                <span class="fw-bold text-white fs-5 ms-3">{{ match.eq2 }}</span>
-                            {% else %}
-                                <span class="fs-4">❓</span>
-                                <span class="fw-bold text-muted fs-5 ms-3 fst-italic">À définir</span>
-                            {% endif %}
-                        </div>
+            <div id="collapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#accordionMatchs">
+                <div class="accordion-body p-4">
+                    
+                    {% for match in liste_matchs %}
+                    {% set is_poule = ('Journée' in match.phase) %}
+                    
+                    <div class="card mb-3 border-0 shadow-sm" style="background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(5px); border-radius: 12px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'">
+                        <div class="card-body py-3 px-4 d-flex align-items-center justify-content-between">
+                            
+                            <div style="width: 15%; border-right: 1px solid rgba(255,255,255,0.1);">
+                                <div class="text-muted small fw-bold">{{ match.date }}</div>
+                                <span class="fw-bold fs-5" style="color: #4facfe;">{{ match.heure }}</span>
+                            </div>
+                            
+                            <div class="d-flex justify-content-end align-items-center" style="width: 35%;">
+                                {% if is_poule %}
+                                    <span class="fw-bold text-white fs-5 me-3">{{ match.eq1 }}</span>
+                                    <img src="{{ match.logo1 }}" width="35" style="border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
+                                {% else %}
+                                    <span class="fw-bold text-muted fs-5 me-3 fst-italic">À définir</span>
+                                    <span class="fs-4">❓</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="text-center" style="width: 15%;">
+                                {% if match.statut == 'Terminé' %}
+                                    <span class="badge bg-danger fs-5 px-3 py-2 shadow">{{ match.vrai_score_eq1 }} - {{ match.vrai_score_eq2 }}</span>
+                                {% else %}
+                                    <span class="badge px-3 py-2" style="background: rgba(255,255,255,0.1); color: #fff;">VS</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="d-flex justify-content-start align-items-center" style="width: 35%;">
+                                {% if is_poule %}
+                                    <img src="{{ match.logo2 }}" width="35" style="border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
+                                    <span class="fw-bold text-white fs-5 ms-3">{{ match.eq2 }}</span>
+                                {% else %}
+                                    <span class="fs-4">❓</span>
+                                    <span class="fw-bold text-muted fs-5 ms-3 fst-italic">À définir</span>
+                                {% endif %}
+                            </div>
 
+                        </div>
                     </div>
-                </div>
-            {% endfor %}
-            
+                    {% endfor %} </div>
+            </div>
         </div>
-    </div>
+        {% endfor %} </div>
 </div>
+
+<style>
+    .accordion-button::after {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+    .accordion-button:not(.collapsed) {
+        color: #fff;
+        background-color: transparent;
+        box-shadow: none;
+    }
+</style>
 
 {% endblock %}

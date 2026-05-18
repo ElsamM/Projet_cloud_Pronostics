@@ -4,6 +4,21 @@
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
 <style>
+    /* LE FOND IMAGE QUI REMPLACE LA VIDÉO */
+    .hero-bg {
+        background-image: linear-gradient(rgba(11, 12, 16, 0.7), rgba(11, 12, 16, 0.7)), url("{{ url_for('static', filename='img/stade_bg.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        height: 100vh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: -90px;
+        position: relative;
+        overflow: hidden;
+    }
+
     /* LE FOND DYNAMIQUE PREMIUM */
     .pro-bg {
         background: linear-gradient(135deg, #050a15 0%, #0a1128 50%, #111a3a 100%);
@@ -34,7 +49,7 @@
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
 
-    /* TEXTES EN DÉGRADÉ (Avec correctif VS Code) */
+    /* TEXTES EN DÉGRADÉ */
     .text-gradient-red {
         background: linear-gradient(90deg, #ed2939, #ff5e62);
         -webkit-background-clip: text;
@@ -70,22 +85,20 @@
     }
     .marquee-content img { height: 45px; margin: 0 40px; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
     @keyframes marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
+    @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0) translateX(-50%);} 40% {transform: translateY(-15px) translateX(-50%);} 60% {transform: translateY(-7px) translateX(-50%);} }
 </style>
 
-<div style="position: relative; height: 100vh; width: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-top: -90px;">
-    <video autoplay loop muted playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; filter: brightness(0.35);">
-        <source src="{{ url_for('static', filename='video/trailler.mp4') }}" type="video/mp4">
-    </video>
+<div class="hero-bg">
     <div style="position: relative; z-index: 1; text-align: center; padding-top: 90px;">
         <h1 class="fw-bold text-white text-uppercase" style="font-size: 5rem; letter-spacing: -2px;" data-aos="zoom-out" data-aos-duration="1200">World Cup 2026</h1>
         <p class="text-light mt-3" style="font-size: 1.5rem; font-weight: 300;" data-aos="fade-up" data-aos-delay="400">La plus grande compétition de l'histoire.</p>
-        <a href="/dashboard" class="btn mt-5 px-5 py-3 rounded-pill fw-bold shadow-lg text-white" style="background-color: #ed2939; font-size: 1.2rem; transition: transform 0.2s;" data-aos="fade-up" data-aos-delay="700" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">FAIRE MES PRONOSTICS</a>
+        
+        <a href="/login" class="btn mt-5 px-5 py-3 rounded-pill fw-bold shadow-lg text-white" style="background-color: #1e3a8a; font-size: 1.2rem; transition: transform 0.2s;" data-aos="fade-up" data-aos-delay="700" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">SE CONNECTER</a>
     </div>
     <div style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); animation: bounce 2s infinite;" data-aos="fade-in" data-aos-delay="1500">
         <span class="text-white opacity-50 fs-3">↓</span>
     </div>
 </div>
-<style> @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0) translateX(-50%);} 40% {transform: translateY(-15px) translateX(-50%);} 60% {transform: translateY(-7px) translateX(-50%);} } </style>
 
 <div class="pro-bg pt-5 pb-5">
     
@@ -154,10 +167,10 @@
                     <div style="position: relative; z-index: 1;">
                         <h3 class="fw-bold text-white mb-4">Votre Mission 🎯</h3>
                         <p class="text-light mb-4" style="opacity: 0.85; line-height: 1.8;">
-                            L'instinct ne suffit plus. Analysez les statistiques, anticipez les surprises et défiez la communauté de l'ESME. <br><br>
+                            L'instinct ne suffit plus. Analysez les statistiques, anticipez les surprises et défiez la communauté CFTC. <br><br>
                             Chaque but à la 90ème minute peut bouleverser le classement. Serez-vous le grand tacticien de cette édition ?
                         </p>
-                        <a href="/dashboard" class="btn btn-outline-light w-100 rounded-pill fw-bold py-3 mt-2" style="border-width: 2px;">RELEVER LE DÉFI</a>
+                        <a href="/login" class="btn btn-outline-light w-100 rounded-pill fw-bold py-3 mt-2" style="border-width: 2px;">RELEVER LE DÉFI</a>
                     </div>
                 </div>
             </div>

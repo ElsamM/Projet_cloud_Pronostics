@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WC 2026 - ESME</title>
+    <title>WC 2026 - Pronostics CFTC</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body style="background-color: #0b0c10; color: #fff;">
 
-    <style>
+<style>
     /* Effets Pro pour la Navbar */
     .nav-link-custom {
-        white-space: nowrap; /* Empêche de passer sur 2 lignes */
+        white-space: nowrap;
         transition: all 0.2s ease-in-out;
         border-radius: 8px;
         padding: 8px 16px !important;
@@ -21,7 +21,7 @@
     .nav-link-custom:hover {
         background: rgba(255, 255, 255, 0.1);
         box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
-        transform: translateY(-2px); /* Se soulève légèrement */
+        transform: translateY(-2px);
     }
     /* Effet d'enfoncement au clic */
     .nav-link-custom:active {
@@ -43,47 +43,39 @@
     
     /* CORRECTION DU TEXTE ILLISIBLE */
     .text-muted {
-        color: #94a3b8 !important; /* Un gris clair très lisible sur fond sombre */
+        color: #94a3b8 !important;
     }
-
-    /* FOND PREMIUM POUR TOUT LE SITE */
-    body {
-        background-color: #0b0c10 !important;
-        background-image: 
-            radial-gradient(circle at 15% 50%, rgba(20, 40, 80, 0.4), transparent 50%),
-            radial-gradient(circle at 85% 30%, rgba(237, 41, 57, 0.15), transparent 50%);
-        background-attachment: fixed;
-        color: #f8fafc !important;
-    }
-    
-    /* CORRECTION DU TEXTE ILLISIBLE */
-    .text-muted {
-        color: #94a3b8 !important; /* Un gris clair très lisible sur fond sombre */
-    }
-
 </style>
 
-
-
-<nav class="navbar navbar-expand-lg py-3" style="background-color: #0b0c10; border-bottom: 3px solid #ed2939;">
+<nav class="navbar navbar-expand-lg py-3" style="background-color: #0b0c10; border-bottom: 3px solid #1e3a8a;">
     <div class="container">
-        <a class="navbar-brand fw-bold d-flex align-items-center" href="/accueil" style="color: #fff;">
-            <img src="{{ url_for('static', filename='img/Esme-sudria-logo.png') }}" alt="ESME" height="45" class="me-3" style="border-radius: 5px;">
-            | Allez les Bleus FR
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('accueil') }}" style="color: #fff;">
+            <img src="{{ url_for('static', filename='img/cftc_logo.png') }}" alt="CFTC" height="45" class="me-2 bg-white rounded p-1">
+            | Pronostics CFTC
         </a>
         
-        {% if request.endpoint not in ['index', 'login', 'register'] %}
+        {% if request.endpoint not in ['login', 'register'] %}
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainMenu">
-            <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="mainMenu">
             <ul class="navbar-nav mx-auto fw-semibold d-flex align-items-center">
-                <li class="nav-item mx-1"><a class="nav-link text-light nav-link-custom" href="/accueil">Accueil</a></li>
-                <li class="nav-item mx-1"><a class="nav-link text-light nav-link-custom" href="/dashboard">Mes Pronostics</a></li>
-                <li class="nav-item mx-1"><a class="nav-link text-light nav-link-custom" href="/calendrier">Calendrier</a></li>
-                <li class="nav-item mx-1"><a class="nav-link text-muted nav-link-custom" href="#">Équipes</a></li>
-                <li class="nav-item mx-1"><a class="nav-link text-light nav-link-custom" href="/ranking">Classement</a></li>
+                <li class="nav-item mx-1">
+                    <a class="nav-link text-light nav-link-custom" href="{{ url_for('accueil') }}">Accueil</a>
+                </li>
+                <li class="nav-item mx-1">
+                    <a class="nav-link text-light nav-link-custom" href="{{ url_for('dashboard') }}">Mes Pronostics</a>
+                </li>
+                <li class="nav-item mx-1">
+                    <a class="nav-link text-light nav-link-custom" href="{{ url_for('calendrier') }}">Calendrier</a>
+                </li>
+                <li class="nav-item mx-1">
+                    <a class="nav-link text-light nav-link-custom" href="{{ url_for('ranking') }}">Classement</a>
+                </li>
+                <li class="nav-item mx-1">
+                    <a class="nav-link text-light nav-link-custom" href="{{ url_for('reglement') }}">Règlements</a>
+                </li>
             </ul>
             
             <ul class="navbar-nav d-flex align-items-center">
@@ -93,8 +85,8 @@
                         <img src="{{ url_for('static', filename='img/setting.png') }}" width="22" alt="Paramètres">
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow-lg mt-2" style="border-radius: 10px;">
-                        <li><a class="dropdown-item text-light" href="#">Mon Profil</a></li>
-                        <li><a class="dropdown-item text-light" href="#">Préférences</a></li>
+                        <li><a class="dropdown-item text-light" href="{{ url_for('profil') }}">Mon Profil</a></li>
+                        <li><a class="dropdown-item text-light" href="{{ url_for('preferences') }}">Préférences</a></li>
                         
                         {% if session.get('email') == 'admin@esme.fr' %}
                         <li><hr class="dropdown-divider border-secondary"></li>
