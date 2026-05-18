@@ -160,10 +160,6 @@ def ranking():
     conn.close()
     return render_template('ranking.html', users=users)
 
-# NOUVELLE ROUTE : Règlements ATNIL
-@app.route('/reglement')
-def reglement():
-    return render_template('reglement.html')
 
 @app.route('/logout')
 def logout():
