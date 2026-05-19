@@ -35,3 +35,4 @@ CREATE TABLE Pronostics (
     points_obtenus INTEGER DEFAULT 0,
     FOREIGN KEY (id_utilisateur) REFERENCES Utilisateurs(id),
     FOREIGN KEY (id_match) REFERENCES Matchs(id)
+);
