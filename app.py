@@ -7,20 +7,36 @@ import random
 app = Flask(__name__)
 app.secret_key = 'projet_world_cup_2026_key'
 
-# Le dictionnaire universel des drapeaux (Plus aucun drapeau ne manquera !)
+# LE NOUVEAU DICTIONNAIRE OFFICIEL DES 48 DRAPEAUX
 DRAPEAUX = {
-    "Mexique": "https://flagcdn.com/w80/mx.png", "Afrique du Sud": "https://flagcdn.com/w80/za.png", "Corée du Sud": "https://flagcdn.com/w80/kr.png", "Europe D": "https://flagcdn.com/w80/un.png",
-    "Canada": "https://flagcdn.com/w80/ca.png", "Europe A": "https://flagcdn.com/w80/un.png", "Qatar": "https://flagcdn.com/w80/qa.png", "Suisse": "https://flagcdn.com/w80/ch.png",
+    "Mexique": "https://flagcdn.com/w80/mx.png", "Afrique du Sud": "https://flagcdn.com/w80/za.png", "République de Corée": "https://flagcdn.com/w80/kr.png", "Tchéquie": "https://flagcdn.com/w80/cz.png",
+    "Canada": "https://flagcdn.com/w80/ca.png", "Bosnie-et-Herzégovine": "https://flagcdn.com/w80/ba.png", "Qatar": "https://flagcdn.com/w80/qa.png", "Suisse": "https://flagcdn.com/w80/ch.png",
     "Brésil": "https://flagcdn.com/w80/br.png", "Maroc": "https://flagcdn.com/w80/ma.png", "Haïti": "https://flagcdn.com/w80/ht.png", "Écosse": "https://flagcdn.com/w80/gb-sct.png",
-    "États-Unis": "https://flagcdn.com/w80/us.png", "Paraguay": "https://flagcdn.com/w80/py.png", "Australie": "https://flagcdn.com/w80/au.png", "Europe C": "https://flagcdn.com/w80/un.png",
+    "États-Unis": "https://flagcdn.com/w80/us.png", "Paraguay": "https://flagcdn.com/w80/py.png", "Australie": "https://flagcdn.com/w80/au.png", "Turquie": "https://flagcdn.com/w80/tr.png",
     "Allemagne": "https://flagcdn.com/w80/de.png", "Curaçao": "https://flagcdn.com/w80/cw.png", "Côte d'Ivoire": "https://flagcdn.com/w80/ci.png", "Équateur": "https://flagcdn.com/w80/ec.png",
-    "Pays-Bas": "https://flagcdn.com/w80/nl.png", "Japon": "https://flagcdn.com/w80/jp.png", "Europe B": "https://flagcdn.com/w80/un.png", "Tunisie": "https://flagcdn.com/w80/tn.png",
-    "Belgique": "https://flagcdn.com/w80/be.png", "Égypte": "https://flagcdn.com/w80/eg.png", "Iran": "https://flagcdn.com/w80/ir.png", "Nouvelle-Zélande": "https://flagcdn.com/w80/nz.png",
-    "Espagne": "https://flagcdn.com/w80/es.png", "Arabie saoudite": "https://flagcdn.com/w80/sa.png", "Uruguay": "https://flagcdn.com/w80/uy.png", "Cap-Vert": "https://flagcdn.com/w80/cv.png",
-    "France": "https://flagcdn.com/w80/fr.png", "Sénégal": "https://flagcdn.com/w80/sn.png", "Fifa 2": "https://flagcdn.com/w80/un.png", "Norvège": "https://flagcdn.com/w80/no.png",
-    "Argentine": "https://flagcdn.com/w80/ar.png", "Algérie": "https://flagcdn.com/w80/dz.png", "Jordanie": "https://flagcdn.com/w80/jo.png", "Autriche": "https://flagcdn.com/w80/at.png",
-    "Portugal": "https://flagcdn.com/w80/pt.png", "Fifa 1": "https://flagcdn.com/w80/un.png", "Ouzbékistan": "https://flagcdn.com/w80/uz.png", "Colombie": "https://flagcdn.com/w80/co.png",
-    "Angleterre": "https://flagcdn.com/w80/gb-eng.png", "Croatie": "https://flagcdn.com/w80/hr.png", "Panama": "https://flagcdn.com/w80/pa.png", "Ghana": "https://flagcdn.com/w80/gh.png"
+    "Pays-Bas": "https://flagcdn.com/w80/nl.png", "Japon": "https://flagcdn.com/w80/jp.png", "Suède": "https://flagcdn.com/w80/se.png", "Tunisie": "https://flagcdn.com/w80/tn.png",
+    "Belgique": "https://flagcdn.com/w80/be.png", "Égypte": "https://flagcdn.com/w80/eg.png", "RI Iran": "https://flagcdn.com/w80/ir.png", "Nouvelle-Zélande": "https://flagcdn.com/w80/nz.png",
+    "Espagne": "https://flagcdn.com/w80/es.png", "Cap-Vert": "https://flagcdn.com/w80/cv.png", "Arabie saoudite": "https://flagcdn.com/w80/sa.png", "Uruguay": "https://flagcdn.com/w80/uy.png",
+    "France": "https://flagcdn.com/w80/fr.png", "Sénégal": "https://flagcdn.com/w80/sn.png", "Irak": "https://flagcdn.com/w80/iq.png", "Norvège": "https://flagcdn.com/w80/no.png",
+    "Argentine": "https://flagcdn.com/w80/ar.png", "Algérie": "https://flagcdn.com/w80/dz.png", "Autriche": "https://flagcdn.com/w80/at.png", "Jordanie": "https://flagcdn.com/w80/jo.png",
+    "Portugal": "https://flagcdn.com/w80/pt.png", "RD Congo": "https://flagcdn.com/w80/cd.png", "Ouzbékistan": "https://flagcdn.com/w80/uz.png", "Colombie": "https://flagcdn.com/w80/co.png",
+    "Angleterre": "https://flagcdn.com/w80/gb-eng.png", "Croatie": "https://flagcdn.com/w80/hr.png", "Ghana": "https://flagcdn.com/w80/gh.png", "Panamá": "https://flagcdn.com/w80/pa.png"
+}
+
+# LES 12 VRAIS GROUPES OFFICIELS
+GROUPES_FIFA = {
+    'Groupe A': ['Mexique', 'Afrique du Sud', 'République de Corée', 'Tchéquie'],
+    'Groupe B': ['Canada', 'Bosnie-et-Herzégovine', 'Qatar', 'Suisse'],
+    'Groupe C': ['Brésil', 'Maroc', 'Haïti', 'Écosse'],
+    'Groupe D': ['États-Unis', 'Paraguay', 'Australie', 'Turquie'],
+    'Groupe E': ['Allemagne', 'Curaçao', "Côte d'Ivoire", 'Équateur'],
+    'Groupe F': ['Pays-Bas', 'Japon', 'Suède', 'Tunisie'],
+    'Groupe G': ['Belgique', 'Égypte', 'RI Iran', 'Nouvelle-Zélande'],
+    'Groupe H': ['Espagne', 'Cap-Vert', 'Arabie saoudite', 'Uruguay'],
+    'Groupe I': ['France', 'Sénégal', 'Irak', 'Norvège'],
+    'Groupe J': ['Argentine', 'Algérie', 'Autriche', 'Jordanie'],
+    'Groupe K': ['Portugal', 'RD Congo', 'Ouzbékistan', 'Colombie'],
+    'Groupe L': ['Angleterre', 'Croatie', 'Ghana', 'Panamá']
 }
 
 def get_db_connection():
@@ -199,7 +215,7 @@ def randomize():
         
     conn.commit()
     conn.close()
-    flash(f"🎲 Scores générés aléatoirement pour la {phase} !", "success")
+    flash(f"Scores générés aléatoirement pour la {phase} !", "success")
     return redirect(url_for('admin'))
 
 @app.route('/groupes')
@@ -209,19 +225,9 @@ def groupes():
     tous_les_matchs = conn.execute("SELECT * FROM Matchs").fetchall()
     conn.close()
 
-    groupes_fifa = {
-        'Groupe A': ['Mexique', 'Afrique du Sud', 'Corée du Sud', 'Europe D'], 'Groupe B': ['Canada', 'Europe A', 'Qatar', 'Suisse'],
-        'Groupe C': ['Brésil', 'Maroc', 'Haïti', 'Écosse'], 'Groupe D': ['États-Unis', 'Paraguay', 'Australie', 'Europe C'],
-        'Groupe E': ['Allemagne', 'Curaçao', "Côte d'Ivoire", 'Équateur'], 'Groupe F': ['Pays-Bas', 'Japon', 'Europe B', 'Tunisie'],
-        'Groupe G': ['Belgique', 'Égypte', 'Iran', 'Nouvelle-Zélande'], 'Groupe H': ['Espagne', 'Arabie saoudite', 'Uruguay', 'Cap-Vert'],
-        'Groupe I': ['France', 'Sénégal', 'Fifa 2', 'Norvège'], 'Groupe J': ['Argentine', 'Algérie', 'Jordanie', 'Autriche'],
-        'Groupe K': ['Portugal', 'Fifa 1', 'Ouzbékistan', 'Colombie'], 'Groupe L': ['Angleterre', 'Croatie', 'Panama', 'Ghana']
-    }
-
     stats = {}
-    for grp, equipes in groupes_fifa.items():
+    for grp, equipes in GROUPES_FIFA.items():
         for eq in equipes:
-            # Ici on force le logo officiel pour chaque équipe, quoi qu'il arrive !
             stats[eq] = {'nom': eq, 'groupe': grp, 'pts': 0, 'mj': 0, 'g': 0, 'n': 0, 'p': 0, 'bp': 0, 'bc': 0, 'diff': 0, 'logo': DRAPEAUX.get(eq, "https://flagcdn.com/w80/un.png")}
 
     for m in matchs_poules:
@@ -242,7 +248,7 @@ def groupes():
                 if eq2 in stats: stats[eq2]['pts'] += 1; stats[eq2]['n'] += 1
 
     classement_final = {}
-    for grp, equipes in groupes_fifa.items():
+    for grp, equipes in GROUPES_FIFA.items():
         eqs = [stats[eq] for eq in equipes]
         eqs.sort(key=lambda x: (x['pts'], x['diff'], x['bp']), reverse=True)
         classement_final[grp] = eqs
@@ -273,17 +279,8 @@ def generer_arbre():
     conn = get_db_connection()
     matchs = conn.execute("SELECT * FROM Matchs WHERE statut = 'Terminé' AND phase LIKE 'Journée%'").fetchall()
     
-    groupes_fifa = {
-        'Groupe A': ['Mexique', 'Afrique du Sud', 'Corée du Sud', 'Europe D'], 'Groupe B': ['Canada', 'Europe A', 'Qatar', 'Suisse'],
-        'Groupe C': ['Brésil', 'Maroc', 'Haïti', 'Écosse'], 'Groupe D': ['États-Unis', 'Paraguay', 'Australie', 'Europe C'],
-        'Groupe E': ['Allemagne', 'Curaçao', "Côte d'Ivoire", 'Équateur'], 'Groupe F': ['Pays-Bas', 'Japon', 'Europe B', 'Tunisie'],
-        'Groupe G': ['Belgique', 'Égypte', 'Iran', 'Nouvelle-Zélande'], 'Groupe H': ['Espagne', 'Arabie saoudite', 'Uruguay', 'Cap-Vert'],
-        'Groupe I': ['France', 'Sénégal', 'Fifa 2', 'Norvège'], 'Groupe J': ['Argentine', 'Algérie', 'Jordanie', 'Autriche'],
-        'Groupe K': ['Portugal', 'Fifa 1', 'Ouzbékistan', 'Colombie'], 'Groupe L': ['Angleterre', 'Croatie', 'Panama', 'Ghana']
-    }
-    
     stats = {eq: {'nom': eq, 'pts': 0, 'diff': 0, 'bp': 0, 'logo': DRAPEAUX.get(eq, "https://flagcdn.com/w80/un.png")} 
-             for equipes in groupes_fifa.values() for eq in equipes}
+             for equipes in GROUPES_FIFA.values() for eq in equipes}
              
     for m in matchs:
         eq1, eq2, sc1, sc2 = m['eq1'], m['eq2'], m['vrai_score_eq1'], m['vrai_score_eq2']
@@ -301,7 +298,7 @@ def generer_arbre():
     qualifies_directs = []
     tous_les_troisiemes = []
     
-    for grp, equipes in groupes_fifa.items():
+    for grp, equipes in GROUPES_FIFA.items():
         eqs = [stats[eq] for eq in equipes]
         eqs.sort(key=lambda x: (x['pts'], x['diff'], x['bp']), reverse=True)
         qualifies_directs.extend(eqs[:2])
@@ -333,7 +330,7 @@ def generer_arbre():
     conn.commit()
     conn.close()
     
-    flash("🏆 Arbre des phases finales généré avec les 32 qualifiés !", "success")
+    flash("Arbre des phases finales généré avec les 32 qualifiés !", "success")
     return redirect(url_for('admin'))
 
 if __name__ == '__main__':
