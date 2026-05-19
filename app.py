@@ -222,11 +222,7 @@ def admin():
         return redirect(url_for('admin'))
 
     # Récupérer tous les matchs pour les afficher sur la page admin
-    matchs = conn.execute('''SELECT m.*, e1.nom_pays as eq1, e2.nom_pays as eq2 
-                             FROM Matchs m
-                             JOIN Equipes e1 ON m.id_equipe1 = e1.id
-                             JOIN Equipes e2 ON m.id_equipe2 = e2.id
-                             ORDER BY m.date ASC''').fetchall()
+    matchs = conn.execute('SELECT * FROM Matchs').fetchall()
     conn.close()
     return render_template('admin.html', matchs=matchs)
 
