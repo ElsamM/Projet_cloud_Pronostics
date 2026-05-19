@@ -7,6 +7,22 @@ import random
 app = Flask(__name__)
 app.secret_key = 'projet_world_cup_2026_key'
 
+# Le dictionnaire universel des drapeaux (Plus aucun drapeau ne manquera !)
+DRAPEAUX = {
+    "Mexique": "https://flagcdn.com/w80/mx.png", "Afrique du Sud": "https://flagcdn.com/w80/za.png", "Corée du Sud": "https://flagcdn.com/w80/kr.png", "Europe D": "https://flagcdn.com/w80/un.png",
+    "Canada": "https://flagcdn.com/w80/ca.png", "Europe A": "https://flagcdn.com/w80/un.png", "Qatar": "https://flagcdn.com/w80/qa.png", "Suisse": "https://flagcdn.com/w80/ch.png",
+    "Brésil": "https://flagcdn.com/w80/br.png", "Maroc": "https://flagcdn.com/w80/ma.png", "Haïti": "https://flagcdn.com/w80/ht.png", "Écosse": "https://flagcdn.com/w80/gb-sct.png",
+    "États-Unis": "https://flagcdn.com/w80/us.png", "Paraguay": "https://flagcdn.com/w80/py.png", "Australie": "https://flagcdn.com/w80/au.png", "Europe C": "https://flagcdn.com/w80/un.png",
+    "Allemagne": "https://flagcdn.com/w80/de.png", "Curaçao": "https://flagcdn.com/w80/cw.png", "Côte d'Ivoire": "https://flagcdn.com/w80/ci.png", "Équateur": "https://flagcdn.com/w80/ec.png",
+    "Pays-Bas": "https://flagcdn.com/w80/nl.png", "Japon": "https://flagcdn.com/w80/jp.png", "Europe B": "https://flagcdn.com/w80/un.png", "Tunisie": "https://flagcdn.com/w80/tn.png",
+    "Belgique": "https://flagcdn.com/w80/be.png", "Égypte": "https://flagcdn.com/w80/eg.png", "Iran": "https://flagcdn.com/w80/ir.png", "Nouvelle-Zélande": "https://flagcdn.com/w80/nz.png",
+    "Espagne": "https://flagcdn.com/w80/es.png", "Arabie saoudite": "https://flagcdn.com/w80/sa.png", "Uruguay": "https://flagcdn.com/w80/uy.png", "Cap-Vert": "https://flagcdn.com/w80/cv.png",
+    "France": "https://flagcdn.com/w80/fr.png", "Sénégal": "https://flagcdn.com/w80/sn.png", "Fifa 2": "https://flagcdn.com/w80/un.png", "Norvège": "https://flagcdn.com/w80/no.png",
+    "Argentine": "https://flagcdn.com/w80/ar.png", "Algérie": "https://flagcdn.com/w80/dz.png", "Jordanie": "https://flagcdn.com/w80/jo.png", "Autriche": "https://flagcdn.com/w80/at.png",
+    "Portugal": "https://flagcdn.com/w80/pt.png", "Fifa 1": "https://flagcdn.com/w80/un.png", "Ouzbékistan": "https://flagcdn.com/w80/uz.png", "Colombie": "https://flagcdn.com/w80/co.png",
+    "Angleterre": "https://flagcdn.com/w80/gb-eng.png", "Croatie": "https://flagcdn.com/w80/hr.png", "Panama": "https://flagcdn.com/w80/pa.png", "Ghana": "https://flagcdn.com/w80/gh.png"
+}
+
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
@@ -89,7 +105,6 @@ def dashboard():
         'finale': conn.execute("SELECT count(*) as c FROM Matchs WHERE phase LIKE '%Demi%' AND statut != 'Terminé'").fetchone()['c'] == 0
     }
 
-    # CORRECTION : On lit directement les matchs sans faire de JOIN avec une vieille table
     matchs = conn.execute('''
         SELECT m.*, p.prono_score_eq1, p.prono_score_eq2
         FROM Matchs m
@@ -99,12 +114,13 @@ def dashboard():
                 WHEN m.phase LIKE '%Journée 1%' THEN 1
                 WHEN m.phase LIKE '%Journée 2%' THEN 2
                 WHEN m.phase LIKE '%Journée 3%' THEN 3
-                WHEN m.phase LIKE '%Huitièmes%' THEN 4
-                WHEN m.phase LIKE '%Quarts%' THEN 5
-                WHEN m.phase LIKE '%Demi%' THEN 6
-                WHEN m.phase LIKE '%Petite finale%' THEN 7
-                WHEN m.phase LIKE '%Finale%' THEN 8
-                ELSE 9
+                WHEN m.phase LIKE '%Seizièmes%' THEN 4
+                WHEN m.phase LIKE '%Huitièmes%' THEN 5
+                WHEN m.phase LIKE '%Quarts%' THEN 6
+                WHEN m.phase LIKE '%Demi%' THEN 7
+                WHEN m.phase LIKE '%Petite finale%' THEN 8
+                WHEN m.phase LIKE '%Finale%' THEN 9
+                ELSE 10
             END,
             m.date ASC, m.heure ASC
     ''', (user_id,)).fetchall()
@@ -119,7 +135,6 @@ def dashboard():
 def calendrier():
     if 'user_id' not in session: return redirect(url_for('login'))
     conn = get_db_connection()
-    # CORRECTION : Idem, lecture directe
     matchs = conn.execute('SELECT * FROM Matchs ORDER BY date ASC, heure ASC').fetchall()
     conn.close()
     return render_template('calendrier.html', matchs=matchs)
@@ -178,50 +193,37 @@ def randomize():
     matchs = conn.execute('SELECT id FROM Matchs WHERE phase = ? AND statut != "Terminé"', (phase,)).fetchall()
     
     for m in matchs:
-        score1 = random.randint(0, 5) # MODIFICATION : Scores de 0 à 5
+        score1 = random.randint(0, 5)
         score2 = random.randint(0, 5)
         conn.execute("UPDATE Matchs SET vrai_score_eq1 = ?, vrai_score_eq2 = ?, statut = 'Terminé' WHERE id = ?", (score1, score2, m['id']))
         
     conn.commit()
     conn.close()
-    flash(f"Scores générés aléatoirement pour la {phase} !", "success")
+    flash(f"🎲 Scores générés aléatoirement pour la {phase} !", "success")
     return redirect(url_for('admin'))
 
 @app.route('/groupes')
 def groupes():
     conn = get_db_connection()
-    # On récupère les matchs de poules terminés pour le calcul des points
     matchs_poules = conn.execute("SELECT * FROM Matchs WHERE statut = 'Terminé' AND phase LIKE 'Journée%'").fetchall()
-    # On récupère TOUT le reste pour dessiner l'arbre
     tous_les_matchs = conn.execute("SELECT * FROM Matchs").fetchall()
     conn.close()
 
     groupes_fifa = {
-        'Groupe A': ['Mexique', 'Afrique du Sud', 'Corée du Sud', 'Europe D'],
-        'Groupe B': ['Canada', 'Europe A', 'Qatar', 'Suisse'],
-        'Groupe C': ['Brésil', 'Maroc', 'Haïti', 'Écosse'],
-        'Groupe D': ['États-Unis', 'Paraguay', 'Australie', 'Europe C'],
-        'Groupe E': ['Allemagne', 'Curaçao', "Côte d'Ivoire", 'Équateur'],
-        'Groupe F': ['Pays-Bas', 'Japon', 'Europe B', 'Tunisie'],
-        'Groupe G': ['Belgique', 'Égypte', 'Iran', 'Nouvelle-Zélande'],
-        'Groupe H': ['Espagne', 'Arabie saoudite', 'Uruguay', 'Cap-Vert'],
-        'Groupe I': ['France', 'Sénégal', 'Fifa 2', 'Norvège'],
-        'Groupe J': ['Argentine', 'Algérie', 'Jordanie', 'Autriche'],
-        'Groupe K': ['Portugal', 'Fifa 1', 'Ouzbékistan', 'Colombie'],
-        'Groupe L': ['Angleterre', 'Croatie', 'Panama', 'Ghana']
+        'Groupe A': ['Mexique', 'Afrique du Sud', 'Corée du Sud', 'Europe D'], 'Groupe B': ['Canada', 'Europe A', 'Qatar', 'Suisse'],
+        'Groupe C': ['Brésil', 'Maroc', 'Haïti', 'Écosse'], 'Groupe D': ['États-Unis', 'Paraguay', 'Australie', 'Europe C'],
+        'Groupe E': ['Allemagne', 'Curaçao', "Côte d'Ivoire", 'Équateur'], 'Groupe F': ['Pays-Bas', 'Japon', 'Europe B', 'Tunisie'],
+        'Groupe G': ['Belgique', 'Égypte', 'Iran', 'Nouvelle-Zélande'], 'Groupe H': ['Espagne', 'Arabie saoudite', 'Uruguay', 'Cap-Vert'],
+        'Groupe I': ['France', 'Sénégal', 'Fifa 2', 'Norvège'], 'Groupe J': ['Argentine', 'Algérie', 'Jordanie', 'Autriche'],
+        'Groupe K': ['Portugal', 'Fifa 1', 'Ouzbékistan', 'Colombie'], 'Groupe L': ['Angleterre', 'Croatie', 'Panama', 'Ghana']
     }
-
-    logos = {}
-    for m in tous_les_matchs:
-        if m['eq1'] not in logos and m['eq1'] != 'À définir': logos[m['eq1']] = m['logo1']
-        if m['eq2'] not in logos and m['eq2'] != 'À définir': logos[m['eq2']] = m['logo2']
 
     stats = {}
     for grp, equipes in groupes_fifa.items():
         for eq in equipes:
-            stats[eq] = {'nom': eq, 'groupe': grp, 'pts': 0, 'mj': 0, 'g': 0, 'n': 0, 'p': 0, 'bp': 0, 'bc': 0, 'diff': 0, 'logo': logos.get(eq, "https://flagcdn.com/w80/un.png")}
+            # Ici on force le logo officiel pour chaque équipe, quoi qu'il arrive !
+            stats[eq] = {'nom': eq, 'groupe': grp, 'pts': 0, 'mj': 0, 'g': 0, 'n': 0, 'p': 0, 'bp': 0, 'bc': 0, 'diff': 0, 'logo': DRAPEAUX.get(eq, "https://flagcdn.com/w80/un.png")}
 
-    # L'ALGORITHME DE CALCUL FIFA
     for m in matchs_poules:
         eq1, eq2, sc1, sc2 = m['eq1'], m['eq2'], m['vrai_score_eq1'], m['vrai_score_eq2']
         if sc1 is not None and sc2 is not None:
@@ -238,14 +240,13 @@ def groupes():
             else:
                 if eq1 in stats: stats[eq1]['pts'] += 1; stats[eq1]['n'] += 1
                 if eq2 in stats: stats[eq2]['pts'] += 1; stats[eq2]['n'] += 1
-                
+
     classement_final = {}
     for grp, equipes in groupes_fifa.items():
         eqs = [stats[eq] for eq in equipes]
         eqs.sort(key=lambda x: (x['pts'], x['diff'], x['bp']), reverse=True)
         classement_final[grp] = eqs
 
-    # C'est cette ligne qui a changé pour envoyer 'matchs' au fichier HTML :
     return render_template('groupes.html', classement=classement_final, matchs=tous_les_matchs)
 
 @app.route('/profil')
@@ -270,10 +271,7 @@ def generer_arbre():
         return redirect(url_for('dashboard'))
         
     conn = get_db_connection()
-    
-    # 1. Récupérer les stats actuelles (le même calcul que sur ta page Groupes)
     matchs = conn.execute("SELECT * FROM Matchs WHERE statut = 'Terminé' AND phase LIKE 'Journée%'").fetchall()
-    tous_les_matchs = conn.execute("SELECT eq1, logo1, eq2, logo2 FROM Matchs").fetchall()
     
     groupes_fifa = {
         'Groupe A': ['Mexique', 'Afrique du Sud', 'Corée du Sud', 'Europe D'], 'Groupe B': ['Canada', 'Europe A', 'Qatar', 'Suisse'],
@@ -284,10 +282,7 @@ def generer_arbre():
         'Groupe K': ['Portugal', 'Fifa 1', 'Ouzbékistan', 'Colombie'], 'Groupe L': ['Angleterre', 'Croatie', 'Panama', 'Ghana']
     }
     
-    logos = {m['eq1']: m['logo1'] for m in tous_les_matchs}
-    logos.update({m['eq2']: m['logo2'] for m in tous_les_matchs})
-    
-    stats = {eq: {'nom': eq, 'pts': 0, 'diff': 0, 'bp': 0, 'logo': logos.get(eq, "https://flagcdn.com/w80/un.png")} 
+    stats = {eq: {'nom': eq, 'pts': 0, 'diff': 0, 'bp': 0, 'logo': DRAPEAUX.get(eq, "https://flagcdn.com/w80/un.png")} 
              for equipes in groupes_fifa.values() for eq in equipes}
              
     for m in matchs:
@@ -303,28 +298,23 @@ def generer_arbre():
                 if eq1 in stats: stats[eq1]['pts'] += 1
                 if eq2 in stats: stats[eq2]['pts'] += 1
 
-    # 2. Sélectionner les 32 qualifiés
     qualifies_directs = []
     tous_les_troisiemes = []
     
     for grp, equipes in groupes_fifa.items():
         eqs = [stats[eq] for eq in equipes]
         eqs.sort(key=lambda x: (x['pts'], x['diff'], x['bp']), reverse=True)
-        qualifies_directs.extend(eqs[:2]) # Les 2 premiers
-        tous_les_troisiemes.append(eqs[2]) # Le 3ème
+        qualifies_directs.extend(eqs[:2])
+        tous_les_troisiemes.append(eqs[2])
         
     tous_les_troisiemes.sort(key=lambda x: (x['pts'], x['diff'], x['bp']), reverse=True)
-    meilleurs_troisiemes = tous_les_troisiemes[:8] # Les 8 meilleurs
+    meilleurs_troisiemes = tous_les_troisiemes[:8]
     
     les_32_equipes = qualifies_directs + meilleurs_troisiemes
-    
-    # On mélange légèrement pour les rencontres (Simulation de tirage au sort)
     random.shuffle(les_32_equipes)
 
-    # 3. Supprimer l'ancien arbre s'il existe et créer le nouveau
     conn.execute("DELETE FROM Matchs WHERE phase NOT LIKE 'Journée%'")
     
-    # Création des 16 matchs de Seizièmes
     for i in range(0, 32, 2):
         eqA, eqB = les_32_equipes[i], les_32_equipes[i+1]
         conn.execute('''
@@ -332,19 +322,18 @@ def generer_arbre():
             VALUES (?, 'À définir', 'À définir', ?, ?, ?, ?, 'En attente')
         ''', ("Seizièmes de finale", eqA['nom'], eqA['logo'], eqB['nom'], eqB['logo']))
         
-    # Création des tours suivants (vides pour l'instant)
     phases_futures = [("Huitièmes de finale", 8), ("Quarts de finale", 4), ("Demi-finales", 2), ("Finale", 1)]
     for phase, nb_matchs in phases_futures:
         for _ in range(nb_matchs):
              conn.execute('''
                 INSERT INTO Matchs (phase, date, heure, eq1, logo1, eq2, logo2, statut)
-                VALUES (?, 'À définir', 'À définir', 'À définir', '', 'À définir', '', 'En attente')
+                VALUES (?, 'À définir', 'À définir', 'À définir', 'https://flagcdn.com/w80/un.png', 'À définir', 'https://flagcdn.com/w80/un.png', 'En attente')
             ''', (phase,))
 
     conn.commit()
     conn.close()
     
-    flash("Arbre des phases finales généré avec les 32 qualifiés !", "success")
+    flash("🏆 Arbre des phases finales généré avec les 32 qualifiés !", "success")
     return redirect(url_for('admin'))
 
 if __name__ == '__main__':
