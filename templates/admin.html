@@ -15,18 +15,27 @@
         </div>
       {% endif %}
     {% endwith %}
+
     <div class="card p-4 mb-4 shadow-sm" style="background: rgba(255, 193, 7, 0.1); border-radius: 12px; border: 1px solid rgba(255, 193, 7, 0.3);">
-    <h5 class="text-warning mb-3 fw-bold">🎲 Mode Test : Simulation Rapide</h5>
-    <p class="text-light small mb-3">Génère des scores aléatoires (0 à 4) pour tous les matchs en attente d'une journée spécifique. Idéal pour tester le système de points.</p>
-    <form method="POST" action="/randomize" class="d-flex align-items-center">
-        <select name="phase" class="form-select me-3 fw-bold" style="max-width: 250px; background-color: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2);">
-            <option value="Journée 1">Simuler la Journée 1</option>
-            <option value="Journée 2">Simuler la Journée 2</option>
-            <option value="Journée 3">Simuler la Journée 3</option>
-        </select>
-        <button type="submit" class="btn btn-warning fw-bold text-dark px-4 shadow">Générer les scores</button>
-    </form>
-</div>
+        <h5 class="text-warning mb-3 fw-bold">Mode Test : Simulation Rapide</h5>
+        <p class="text-light small mb-3">Génère des scores aléatoires (0 à 5) pour tous les matchs en attente d'une journée spécifique. Idéal pour tester le système de points.</p>
+        <form method="POST" action="/randomize" class="d-flex align-items-center">
+            <select name="phase" class="form-select me-3 fw-bold" style="max-width: 250px; background-color: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2);">
+                <option value="Journée 1">Simuler la Journée 1</option>
+                <option value="Journée 2">Simuler la Journée 2</option>
+                <option value="Journée 3">Simuler la Journée 3</option>
+            </select>
+            <button type="submit" class="btn btn-warning fw-bold text-dark px-4 shadow">Générer les scores</button>
+        </form>
+    </div>
+
+    <div class="card p-4 mb-5 shadow-sm" style="background: rgba(220, 53, 69, 0.1); border-radius: 12px; border: 1px solid rgba(220, 53, 69, 0.3);">
+        <h5 class="text-danger mb-3 fw-bold">Générer les Phases Finales</h5>
+        <p class="text-light small mb-3">Calcule automatiquement les 32 qualifiés (1ers, 2èmes et 8 meilleurs 3èmes) à l'issue des phases de groupes et génère l'arbre du tournoi.</p>
+        <form method="POST" action="/generer_arbre">
+            <button type="submit" class="btn btn-danger fw-bold text-white px-4 shadow">Créer l'Arborescence</button>
+        </form>
+    </div>
 
     <div class="row">
         <div class="col-md-12">

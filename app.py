@@ -184,16 +184,16 @@ def randomize():
         
     conn.commit()
     conn.close()
-    flash(f"🎲 Scores générés aléatoirement pour la {phase} !", "success")
+    flash(f"Scores générés aléatoirement pour la {phase} !", "success")
     return redirect(url_for('admin'))
 
 @app.route('/groupes')
 def groupes():
     conn = get_db_connection()
-    # On récupère tous les matchs terminés pour calculer les points
-    matchs = conn.execute("SELECT * FROM Matchs WHERE statut = 'Terminé' AND phase LIKE 'Journée%'").fetchall()
-    # On récupère tous les drapeaux de la BDD pour l'affichage
-    tous_les_matchs = conn.execute("SELECT eq1, logo1, eq2, logo2 FROM Matchs").fetchall()
+    # On récupère les matchs de poules terminés pour le calcul des points
+    matchs_poules = conn.execute("SELECT * FROM Matchs WHERE statut = 'Terminé' AND phase LIKE 'Journée%'").fetchall()
+    # On récupère TOUT le reste pour dessiner l'arbre
+    tous_les_matchs = conn.execute("SELECT * FROM Matchs").fetchall()
     conn.close()
 
     groupes_fifa = {
@@ -213,8 +213,8 @@ def groupes():
 
     logos = {}
     for m in tous_les_matchs:
-        if m['eq1'] not in logos: logos[m['eq1']] = m['logo1']
-        if m['eq2'] not in logos: logos[m['eq2']] = m['logo2']
+        if m['eq1'] not in logos and m['eq1'] != 'À définir': logos[m['eq1']] = m['logo1']
+        if m['eq2'] not in logos and m['eq2'] != 'À définir': logos[m['eq2']] = m['logo2']
 
     stats = {}
     for grp, equipes in groupes_fifa.items():
@@ -222,7 +222,7 @@ def groupes():
             stats[eq] = {'nom': eq, 'groupe': grp, 'pts': 0, 'mj': 0, 'g': 0, 'n': 0, 'p': 0, 'bp': 0, 'bc': 0, 'diff': 0, 'logo': logos.get(eq, "https://flagcdn.com/w80/un.png")}
 
     # L'ALGORITHME DE CALCUL FIFA
-    for m in matchs:
+    for m in matchs_poules:
         eq1, eq2, sc1, sc2 = m['eq1'], m['eq2'], m['vrai_score_eq1'], m['vrai_score_eq2']
         if sc1 is not None and sc2 is not None:
             if eq1 in stats:
@@ -238,15 +238,15 @@ def groupes():
             else:
                 if eq1 in stats: stats[eq1]['pts'] += 1; stats[eq1]['n'] += 1
                 if eq2 in stats: stats[eq2]['pts'] += 1; stats[eq2]['n'] += 1
-
-    # Tri des poules : 1. Points, 2. Différence de Buts, 3. Buts Pour
+                
     classement_final = {}
     for grp, equipes in groupes_fifa.items():
         eqs = [stats[eq] for eq in equipes]
         eqs.sort(key=lambda x: (x['pts'], x['diff'], x['bp']), reverse=True)
         classement_final[grp] = eqs
 
-    return render_template('groupes.html', classement=classement_final)
+    # C'est cette ligne qui a changé pour envoyer 'matchs' au fichier HTML :
+    return render_template('groupes.html', classement=classement_final, matchs=tous_les_matchs)
 
 @app.route('/profil')
 def profil():
@@ -263,6 +263,89 @@ def preferences():
 
 @app.route('/reglement')
 def reglement(): return render_template('reglement.html')
+
+@app.route('/generer_arbre', methods=['POST'])
+def generer_arbre():
+    if 'user_id' not in session or session.get('email') != 'admin@esme.fr':
+        return redirect(url_for('dashboard'))
+        
+    conn = get_db_connection()
+    
+    # 1. Récupérer les stats actuelles (le même calcul que sur ta page Groupes)
+    matchs = conn.execute("SELECT * FROM Matchs WHERE statut = 'Terminé' AND phase LIKE 'Journée%'").fetchall()
+    tous_les_matchs = conn.execute("SELECT eq1, logo1, eq2, logo2 FROM Matchs").fetchall()
+    
+    groupes_fifa = {
+        'Groupe A': ['Mexique', 'Afrique du Sud', 'Corée du Sud', 'Europe D'], 'Groupe B': ['Canada', 'Europe A', 'Qatar', 'Suisse'],
+        'Groupe C': ['Brésil', 'Maroc', 'Haïti', 'Écosse'], 'Groupe D': ['États-Unis', 'Paraguay', 'Australie', 'Europe C'],
+        'Groupe E': ['Allemagne', 'Curaçao', "Côte d'Ivoire", 'Équateur'], 'Groupe F': ['Pays-Bas', 'Japon', 'Europe B', 'Tunisie'],
+        'Groupe G': ['Belgique', 'Égypte', 'Iran', 'Nouvelle-Zélande'], 'Groupe H': ['Espagne', 'Arabie saoudite', 'Uruguay', 'Cap-Vert'],
+        'Groupe I': ['France', 'Sénégal', 'Fifa 2', 'Norvège'], 'Groupe J': ['Argentine', 'Algérie', 'Jordanie', 'Autriche'],
+        'Groupe K': ['Portugal', 'Fifa 1', 'Ouzbékistan', 'Colombie'], 'Groupe L': ['Angleterre', 'Croatie', 'Panama', 'Ghana']
+    }
+    
+    logos = {m['eq1']: m['logo1'] for m in tous_les_matchs}
+    logos.update({m['eq2']: m['logo2'] for m in tous_les_matchs})
+    
+    stats = {eq: {'nom': eq, 'pts': 0, 'diff': 0, 'bp': 0, 'logo': logos.get(eq, "https://flagcdn.com/w80/un.png")} 
+             for equipes in groupes_fifa.values() for eq in equipes}
+             
+    for m in matchs:
+        eq1, eq2, sc1, sc2 = m['eq1'], m['eq2'], m['vrai_score_eq1'], m['vrai_score_eq2']
+        if sc1 is not None and sc2 is not None:
+            if eq1 in stats: stats[eq1]['bp'] += sc1; stats[eq1]['diff'] += (sc1 - sc2)
+            if eq2 in stats: stats[eq2]['bp'] += sc2; stats[eq2]['diff'] += (sc2 - sc1)
+            if sc1 > sc2:
+                if eq1 in stats: stats[eq1]['pts'] += 3
+            elif sc1 < sc2:
+                if eq2 in stats: stats[eq2]['pts'] += 3
+            else:
+                if eq1 in stats: stats[eq1]['pts'] += 1
+                if eq2 in stats: stats[eq2]['pts'] += 1
+
+    # 2. Sélectionner les 32 qualifiés
+    qualifies_directs = []
+    tous_les_troisiemes = []
+    
+    for grp, equipes in groupes_fifa.items():
+        eqs = [stats[eq] for eq in equipes]
+        eqs.sort(key=lambda x: (x['pts'], x['diff'], x['bp']), reverse=True)
+        qualifies_directs.extend(eqs[:2]) # Les 2 premiers
+        tous_les_troisiemes.append(eqs[2]) # Le 3ème
+        
+    tous_les_troisiemes.sort(key=lambda x: (x['pts'], x['diff'], x['bp']), reverse=True)
+    meilleurs_troisiemes = tous_les_troisiemes[:8] # Les 8 meilleurs
+    
+    les_32_equipes = qualifies_directs + meilleurs_troisiemes
+    
+    # On mélange légèrement pour les rencontres (Simulation de tirage au sort)
+    random.shuffle(les_32_equipes)
+
+    # 3. Supprimer l'ancien arbre s'il existe et créer le nouveau
+    conn.execute("DELETE FROM Matchs WHERE phase NOT LIKE 'Journée%'")
+    
+    # Création des 16 matchs de Seizièmes
+    for i in range(0, 32, 2):
+        eqA, eqB = les_32_equipes[i], les_32_equipes[i+1]
+        conn.execute('''
+            INSERT INTO Matchs (phase, date, heure, eq1, logo1, eq2, logo2, statut)
+            VALUES (?, 'À définir', 'À définir', ?, ?, ?, ?, 'En attente')
+        ''', ("Seizièmes de finale", eqA['nom'], eqA['logo'], eqB['nom'], eqB['logo']))
+        
+    # Création des tours suivants (vides pour l'instant)
+    phases_futures = [("Huitièmes de finale", 8), ("Quarts de finale", 4), ("Demi-finales", 2), ("Finale", 1)]
+    for phase, nb_matchs in phases_futures:
+        for _ in range(nb_matchs):
+             conn.execute('''
+                INSERT INTO Matchs (phase, date, heure, eq1, logo1, eq2, logo2, statut)
+                VALUES (?, 'À définir', 'À définir', 'À définir', '', 'À définir', '', 'En attente')
+            ''', (phase,))
+
+    conn.commit()
+    conn.close()
+    
+    flash("Arbre des phases finales généré avec les 32 qualifiés !", "success")
+    return redirect(url_for('admin'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
