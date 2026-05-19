@@ -51,51 +51,20 @@
     <div class="container">
         <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('accueil') }}" style="color: #fff;">
             <img src="{{ url_for('static', filename='img/cftc_logo.png') }}" alt="CFTC" height="45" class="me-2 bg-white rounded p-1">
-            | Pronostics CFTC
+            | Allez les Bleus FR
         </a>
         
-        {% if request.endpoint not in ['login', 'register'] %}
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainMenu">
-            <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="mainMenu">
-            <ul class="navbar-nav mx-auto fw-semibold d-flex align-items-center">
-                <li class="nav-item mx-1">
-                    <a class="nav-link text-light nav-link-custom" href="{{ url_for('accueil') }}">Accueil</a>
-                </li>
-                <li class="nav-item mx-1">
-                    <a class="nav-link text-light nav-link-custom" href="{{ url_for('dashboard') }}">Mes Pronostics</a>
-                </li>
-                <li class="nav-item mx-1">
-                    <a class="nav-link text-light nav-link-custom" href="{{ url_for('calendrier') }}">Calendrier</a>
-                </li>
-                <li class="nav-item mx-1">
-                    <a class="nav-link text-light nav-link-custom" href="{{ url_for('ranking') }}">Classement</a>
-                </li>
-                <li class="nav-item mx-1">
-                    <a class="nav-link text-light nav-link-custom" href="{{ url_for('reglement') }}">Règlements</a>
-                </li>
-            </ul>
+        <ul class="dropdown-menu dropdown-menu-end shadow-lg mt-2" style="border-radius: 10px; background-color: #1f2833; z-index: 9999;">
+            <li><a class="dropdown-item text-light" href="{{ url_for('profil') }}">Mon Profil</a></li>
             
-            <ul class="navbar-nav d-flex align-items-center">
-                {% if session.get('user_id') %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle nav-link-custom d-flex align-items-center" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown">
-                        <img src="{{ url_for('static', filename='img/setting.png') }}" width="22" alt="Paramètres">
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow-lg mt-2" style="border-radius: 10px;">
-                        <li><a class="dropdown-item text-light" href="{{ url_for('profil') }}">Mon Profil</a></li>
-                        <li><a class="dropdown-item text-light" href="{{ url_for('preferences') }}">Préférences</a></li>
-                        
-                        {% if session.get('email') == 'admin@esme.fr' %}
-                        <li><hr class="dropdown-divider border-secondary"></li>
-                        <li><a class="dropdown-item fw-bold text-warning" href="/admin">⚙️ Administration</a></li>
-                        {% endif %}
-                        
-                        <li><hr class="dropdown-divider border-secondary"></li>
-                        <li><a class="dropdown-item text-danger fw-bold" href="/logout">Déconnexion</a></li>
-                    </ul>
+            {% if session.get('email') == 'admin@esme.fr' %}
+            <li><hr class="dropdown-divider border-secondary"></li>
+            <li><a class="dropdown-item fw-bold text-warning" href="/admin">⚙️ Administration</a></li>
+            {% endif %}
+            
+            <li><hr class="dropdown-divider border-secondary"></li>
+            <li><a class="dropdown-item text-danger fw-bold" href="/logout">Déconnexion</a></li>
+        </ul>
                 </li>
                 {% endif %}
             </ul>

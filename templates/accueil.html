@@ -6,7 +6,7 @@
 <style>
     /* LE FOND IMAGE QUI REMPLACE LA VIDÉO */
     .hero-bg {
-        background-image: linear-gradient(rgba(11, 12, 16, 0.7), rgba(11, 12, 16, 0.7)), url("{{ url_for('static', filename='img/stade_bg.jpg') }}");
+        background-image: linear-gradient(rgba(11, 12, 16, 0.7), rgba(11, 12, 16, 0.7)), url("{{ url_for('static', filename='img/image_bg.jpg') }}");
         background-size: cover;
         background-position: center;
         height: 100vh;
@@ -91,9 +91,9 @@
 <div class="hero-bg">
     <div style="position: relative; z-index: 1; text-align: center; padding-top: 90px;">
         <h1 class="fw-bold text-white text-uppercase" style="font-size: 5rem; letter-spacing: -2px;" data-aos="zoom-out" data-aos-duration="1200">World Cup 2026</h1>
-        <p class="text-light mt-3" style="font-size: 1.5rem; font-weight: 300;" data-aos="fade-up" data-aos-delay="400">La plus grande compétition de l'histoire.</p>
+        <p class="text-light mt-3" style="font-size: 1.5rem; font-weight: 300;" data-aos="fade-up" data-aos-delay="400">La plus grande compétition de l'histoire</p>
         
-        <a href="/login" class="btn mt-5 px-5 py-3 rounded-pill fw-bold shadow-lg text-white" style="background-color: #1e3a8a; font-size: 1.2rem; transition: transform 0.2s;" data-aos="fade-up" data-aos-delay="700" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">SE CONNECTER</a>
+        <a href="/dashboard" class="btn mt-5 px-5 py-3 rounded-pill fw-bold shadow-lg text-white" style="background-color: #1e3a8a; font-size: 1.2rem; transition: transform 0.2s;" data-aos="fade-up" data-aos-delay="700" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">COMMENCER VOS PRONOSTICS</a>
     </div>
     <div style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); animation: bounce 2s infinite;" data-aos="fade-in" data-aos-delay="1500">
         <span class="text-white opacity-50 fs-3">↓</span>
@@ -108,7 +108,7 @@
             <div class="col-md-5" data-aos="fade-right" data-aos-duration="1000">
                 <h2 class="fw-bold text-gradient-red" style="font-size: 3.5rem; letter-spacing: -1px;">Un Format Inédit</h2>
                 <p class="text-light fs-5 mt-4" style="opacity: 0.85; line-height: 1.8;">
-                    L'Amérique du Nord accueille une compétition historique. Oubliez tout ce que vous saviez : ce ne sont plus 32 mais <strong class="text-white">48 nations</strong> qui s'affronteront. La route vers la finale sera plus longue, plus tactique, et plus intense.
+                    L'Amérique du Nord accueille une compétition historique. Oubliez tout ce que vous saviez : ce ne sont plus 32 mais <strong class="text-white">48 nations</strong> qui s'affronteront. La route vers la finale sera plus longue, plus tactique, et plus intense
                 </p>
             </div>
             
@@ -138,7 +138,7 @@
                         <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-4 shadow" style="width: 55px; height: 55px; flex-shrink: 0; font-size: 1.3rem; font-weight: 800;">+3</div>
                         <div>
                             <h5 class="text-white fw-bold mb-1">Score Parfait</h5>
-                            <p class="text-light opacity-75 mb-0 fs-6">Vous avez deviné l'issue exacte du match. Un coup de maître.</p>
+                            <p class="text-light opacity-75 mb-0 fs-6">Vous avez deviné l'issue exacte du match. Un coup de maître</p>
                         </div>
                     </div>
                     
@@ -146,7 +146,7 @@
                         <div class="bg-info text-dark rounded-circle d-flex align-items-center justify-content-center me-4 shadow" style="width: 55px; height: 55px; flex-shrink: 0; font-size: 1.3rem; font-weight: 800;">+1</div>
                         <div>
                             <h5 class="text-white fw-bold mb-1">Bonne Tendance</h5>
-                            <p class="text-light opacity-75 mb-0 fs-6">Vous avez trouvé le bon vainqueur (ou le nul), mais pas le bon score.</p>
+                            <p class="text-light opacity-75 mb-0 fs-6">Vous avez trouvé le bon vainqueur (ou le nul), mais pas le bon score</p>
                         </div>
                     </div>
                     
@@ -154,7 +154,7 @@
                         <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-4 shadow" style="width: 55px; height: 55px; flex-shrink: 0; font-size: 1.3rem; font-weight: 800;">0</div>
                         <div>
                             <h5 class="text-white fw-bold mb-1">Pari Perdu</h5>
-                            <p class="text-light opacity-75 mb-0 fs-6">L'équipe choisie a perdu. Votre intuition vous a trahi.</p>
+                            <p class="text-light opacity-75 mb-0 fs-6">L'équipe choisie a perdu. Votre intuition vous a trahi</p>
                         </div>
                     </div>
                 </div>
@@ -165,12 +165,12 @@
                     <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(237, 41, 57, 0.2); filter: blur(50px); border-radius: 50%; z-index: 0;"></div>
                     
                     <div style="position: relative; z-index: 1;">
-                        <h3 class="fw-bold text-white mb-4">Votre Mission 🎯</h3>
+                        <h3 class="fw-bold text-white mb-4">Votre Mission</h3>
                         <p class="text-light mb-4" style="opacity: 0.85; line-height: 1.8;">
-                            L'instinct ne suffit plus. Analysez les statistiques, anticipez les surprises et défiez la communauté CFTC. <br><br>
+                            L'instinct ne suffit plus. Analysez les statistiques, anticipez les surprises et défiez la communauté CFTC <br><br>
                             Chaque but à la 90ème minute peut bouleverser le classement. Serez-vous le grand tacticien de cette édition ?
                         </p>
-                        <a href="/login" class="btn btn-outline-light w-100 rounded-pill fw-bold py-3 mt-2" style="border-width: 2px;">RELEVER LE DÉFI</a>
+                        <a href="/dashboard" class="btn btn-outline-light w-100 rounded-pill fw-bold py-3 mt-2" style="border-width: 2px;">RELEVER LE DÉFI</a>
                     </div>
                 </div>
             </div>
