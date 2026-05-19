@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import os
-
+import random
 app = Flask(__name__)
 app.secret_key = 'esme_world_cup_2026_key'
 
@@ -242,6 +242,40 @@ def preferences():
 def reglement():
     # En attendant le texte du prof, tu peux mettre un "Lorem Ipsum"
     return render_template('reglement.html')
+
+# --- ROUTE : AFFICHAGE DES GROUPES ---
+@app.route('/groupes')
+def groupes():
+    # Pour l'instant on charge juste le visuel. 
+    # Le calcul mathématique des points viendra à la prochaine étape !
+    return render_template('groupes.html')
+
+# --- ROUTE : RANDOMIZE (Génération de scores) ---
+@app.route('/randomize', methods=['POST'])
+def randomize():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    phase = request.form.get('phase')
+    conn = get_db_connection()
+    
+    # On cherche tous les matchs de la journée choisie qui n'ont pas encore de score
+    matchs = conn.execute('SELECT id FROM Matchs WHERE phase = ? AND statut != "Terminé"', (phase,)).fetchall()
+    
+    for m in matchs:
+        score1 = random.randint(0, 4) # Score au hasard entre 0 et 4
+        score2 = random.randint(0, 4)
+        conn.execute('''
+            UPDATE Matchs 
+            SET vrai_score_eq1 = ?, vrai_score_eq2 = ?, statut = 'Terminé' 
+            WHERE id = ?
+        ''', (score1, score2, m['id']))
+        
+    conn.commit()
+    conn.close()
+    
+    flash(f"Scores générés aléatoirement pour la {phase} !", "success")
+    return redirect(url_for('admin'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

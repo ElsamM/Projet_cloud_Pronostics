@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5 mb-5" style="min-height: calc(100vh - 150px);">
+    
+    <div class="text-center mb-5 p-5" style="background: rgba(255,255,255,0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+        <h1 class="fw-bold text-white display-4" style="letter-spacing: -1px;">Classement des Groupes</h1>
+        <p class="text-light opacity-75 fs-5 mt-3">Suivez l'évolution des équipes en temps réel pour la qualification en phases finales.</p>
+    </div>
+
+    <div class="alert alert-info text-center fs-5 py-4" style="background: rgba(13, 202, 240, 0.1); border: 1px solid rgba(13, 202, 240, 0.3); color: #0dcaf0;">
+        <i class="bi bi-gear-wide-connected fs-2 d-block mb-2"></i>
+        <strong>Maintenance en cours :</strong> L'algorithme de calcul des points (Victoires, Nuls, Défaites, Différence de buts) est en cours de déploiement. Les tableaux s'afficheront ici très bientôt !
+    </div>
+
+</div>
+{% endblock %}
