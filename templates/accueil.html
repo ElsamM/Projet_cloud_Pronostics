@@ -6,18 +6,18 @@
 <style>
     /* LE FOND IMAGE QUI REMPLACE LA VIDÉO */
     .hero-bg {
-        background-image: linear-gradient(rgba(11, 12, 16, 0.7), rgba(11, 12, 16, 0.7)), url("{{ url_for('static', filename='img/image_bg.jpg') }}");
-        background-size: cover;
-        background-position: center;
-        height: 100vh;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: -90px;
-        position: relative;
-        overflow: hidden;
-    }
+    background-image: linear-gradient(rgba(11, 12, 16, 0.7), rgba(11, 12, 16, 0.7)), url("{{ url_for('static', filename='img/image_bg.jpg') }}");
+    background-size: cover;
+    background-position: center;
+    height: 85vh; /* Légèrement réduit pour laisser respirer la navbar */
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0px; /* Changé de -90px à 0px pour faire réapparaître la navbar */
+    position: relative;
+    overflow: hidden;
+}
 
     /* LE FOND DYNAMIQUE PREMIUM */
     .pro-bg {
