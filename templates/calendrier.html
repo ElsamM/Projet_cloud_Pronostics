@@ -10,7 +10,7 @@
 
     <div class="accordion accordion-flush shadow-lg" id="accordionMatchs">
         
-        {% set ordre_phases = ['Journée 1', 'Journée 2', 'Journée 3', 'Huitièmes de Finale', 'Quarts de Finale', 'Demi-finales', '3rd Place Finale', 'Finale'] %}
+        {% set ordre_phases = ['Journée 1', 'Journée 2', 'Journée 3', 'Seizièmes de finale', 'Huitièmes de finale', 'Quarts de finale', 'Demi-finales', 'Finale'] %}
         
         {% for phase_voulue in ordre_phases %}
             {% set liste_matchs = matchs | selectattr('phase', 'equalto', phase_voulue) | list %}
