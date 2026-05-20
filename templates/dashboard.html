@@ -79,13 +79,18 @@
                                                             <span class="text-danger fw-bold d-block" style="font-size: 0.65rem; letter-spacing: 0.5px;">SCORE FINAL</span>
                                                             <span class="text-white fw-bold fs-5">{{ match.vrai_score_eq1 }} - {{ match.vrai_score_eq2 }}</span>
                                                         </div>
+                                                    {% elif match.prono_score_eq1 is not none %}
+                                                        <div class="px-2 py-1 rounded text-center" style="background: rgba(25, 135, 84, 0.2); border: 1px solid rgba(25, 135, 84, 0.5); min-width: 100px;">
+                                                            <span class="text-success fw-bold d-block" style="font-size: 0.65rem; letter-spacing: 0.5px;">PRONOSTIC</span>
+                                                            <span class="text-white fw-bold fs-5">{{ match.prono_score_eq1 }} - {{ match.prono_score_eq2 }}</span>
+                                                        </div>
                                                     {% else %}
-                                                        <input type="number" name="score1" value="{{ match.prono_score_eq1 if match.prono_score_eq1 is not none else '' }}" class="form-control text-center mx-1 fw-bold bg-dark text-white border-secondary p-1" style="width: 45px; height: 35px; border-radius: 6px;" min="0" required>
+                                                        <input type="number" name="score1" class="form-control text-center mx-1 fw-bold bg-dark text-white border-secondary p-1" style="width: 45px; height: 35px; border-radius: 6px;" min="0" required>
                                                         <span class="fs-6 text-white opacity-50">-</span>
-                                                        <input type="number" name="score2" value="{{ match.prono_score_eq2 if match.prono_score_eq2 is not none else '' }}" class="form-control text-center mx-1 fw-bold bg-dark text-white border-secondary p-1" style="width: 45px; height: 35px; border-radius: 6px;" min="0" required>
+                                                        <input type="number" name="score2" class="form-control text-center mx-1 fw-bold bg-dark text-white border-secondary p-1" style="width: 45px; height: 35px; border-radius: 6px;" min="0" required>
                                                     {% endif %}
                                                 </div>
-                                                
+
                                                 <div class="d-flex align-items-center justify-content-start" style="width: 30%;">
                                                     <img src="{{ match.logo2 }}" width="30" height="20" style="border-radius: 3px; object-fit: cover; flex-shrink: 0;">
                                                     <span class="fw-bold text-white fs-5 ms-2 text-truncate text-start" style="max-width: 150px;" title="{{ match.eq2 }}">{{ match.eq2 }}</span>
@@ -93,9 +98,13 @@
 
                                                 <div class="d-flex justify-content-end" style="width: 10%;">
                                                     {% if match.statut != 'Terminé' %}
-                                                        <button type="submit" class="btn btn-success fw-bold btn-sm" style="border-radius: 6px; width: 60px;">OK</button>
+                                                        {% if match.prono_score_eq1 is none %}
+                                                            <button type="submit" class="btn btn-success fw-bold btn-sm" style="border-radius: 6px; width: 60px;">OK</button>
+                                                        {% else %}
+                                                            <span class="badge bg-success" style="padding: 8px;">🔒 Fixé</span>
+                                                        {% endif %}
                                                     {% elif match.points_obtenus is not none %}
-                                                        <span class="badge rounded-pill fw-bold" style="background: #1e3a8a; padding: 8px;">+{{ match.points_obtenus }}</span>
+                                                        <span class="badge rounded-pill fw-bold text-nowrap" style="background: #1e3a8a; padding: 8px;">{{ match.points_obtenus }} PTS</span>
                                                     {% endif %}
                                                 </div>
                                             </form>

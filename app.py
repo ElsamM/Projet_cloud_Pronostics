@@ -108,12 +108,16 @@ def dashboard():
     if request.method == 'POST':
         match_id = request.form['match_id']
         score1, score2 = request.form['score1'], request.form['score2']
-        conn.execute('INSERT OR REPLACE INTO Pronostics (id_utilisateur, id_match, prono_score_eq1, prono_score_eq2) VALUES (?, ?, ?, ?)', 
-                     (user_id, match_id, score1, score2))
+        existant = conn.execute('SELECT id FROM Pronostics WHERE id_utilisateur = ? AND id_match = ?', (user_id, match_id)).fetchone()
+        if existant:
+            conn.execute('UPDATE Pronostics SET prono_score_eq1 = ?, prono_score_eq2 = ? WHERE id = ?', (score1, score2, existant['id']))       
+        else:
+            conn.execute('INSERT INTO Pronostics (id_utilisateur, id_match, prono_score_eq1, prono_score_eq2) VALUES (?, ?, ?, ?)', (user_id, match_id, score1, score2))
         conn.commit()
         flash("Pronostic enregistré avec succès !", "success")
         return redirect(url_for('dashboard'))
-
+        
+        
     unlocked = {
         'huitiemes': conn.execute("SELECT count(*) as c FROM Matchs WHERE phase LIKE '%Journée%' AND statut != 'Terminé'").fetchone()['c'] == 0,
         'quarts': conn.execute("SELECT count(*) as c FROM Matchs WHERE phase LIKE '%Huitièmes%' AND statut != 'Terminé'").fetchone()['c'] == 0,

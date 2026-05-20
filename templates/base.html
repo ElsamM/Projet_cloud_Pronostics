@@ -98,5 +98,46 @@
     {% block content %}{% endblock %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // 1. Disparition automatique des messages flash après 4 secondes
+    setTimeout(function() {
+        let alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            let bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 4000);
+
+    // 2. Maintien de la position de défilement (Scroll) et de l'accordéon
+    document.addEventListener("DOMContentLoaded", function() {
+        // Scroll
+        const scrollPos = sessionStorage.getItem("scrollPosition");
+        if (scrollPos) window.scrollTo(0, parseInt(scrollPos));
+        window.addEventListener("beforeunload", function() {
+            sessionStorage.setItem("scrollPosition", window.scrollY);
+        });
+
+        // Accordéons
+        const accordions = document.querySelectorAll('.accordion-collapse');
+        accordions.forEach(acc => {
+            acc.addEventListener('shown.bs.collapse', function(e) {
+                sessionStorage.setItem("openAccordion", e.target.id);
+            });
+        });
+        
+        const openAccId = sessionStorage.getItem("openAccordion");
+        if (openAccId) {
+            const openAcc = document.getElementById(openAccId);
+            if (openAcc) {
+                // Fermer tous les autres et ouvrir le bon
+                accordions.forEach(a => a.classList.remove('show'));
+                document.querySelectorAll('.accordion-button').forEach(btn => btn.classList.add('collapsed'));
+                openAcc.classList.add('show');
+                const btn = document.querySelector(`[data-bs-target="#${openAccId}"]`);
+                if (btn) btn.classList.remove('collapsed');
+            }
+        }
+    });
+</script>
 </body>
 </html>

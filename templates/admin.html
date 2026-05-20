@@ -1,102 +1,119 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 mb-5" style="min-height: calc(100vh - 150px);">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-uppercase fw-bold text-danger">Panneau d'Administration</h2>
         <a href="/dashboard" class="btn btn-outline-light rounded-pill px-3">Retour au Dashboard</a>
     </div>
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="alert alert-success shadow-sm mb-4" style="border-radius: 8px;">
-        {% for message in messages %}
-          <span class="fw-bold">{{ message }}</span>
-        {% endfor %}
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="card p-4 h-100 shadow-sm" style="background: rgba(255, 193, 7, 0.1); border-radius: 12px; border: 1px solid rgba(255, 193, 7, 0.3);">
+                <h5 class="text-warning mb-3 fw-bold">🎲 Mode Test : Simulation Rapide</h5>
+                <form method="POST" action="/randomize" class="d-flex flex-column gap-3">
+                    <select name="phase" class="form-select fw-bold bg-dark text-white border-secondary">
+                        <option value="Journée 1">Simuler la Journée 1</option>
+                        <option value="Journée 2">Simuler la Journée 2</option>
+                        <option value="Journée 3">Simuler la Journée 3</option>
+                        <option value="Seizièmes de finale">Simuler les Seizièmes</option>
+                        <option value="Huitièmes de finale">Simuler les Huitièmes</option>
+                        <option value="Quarts de finale">Simuler les Quarts</option>
+                        <option value="Demi-finales">Simuler les Demis</option>
+                        <option value="Finale">Simuler la Finale</option>
+                    </select>
+                    <button type="submit" class="btn btn-warning fw-bold text-dark w-100">Générer les scores</button>
+                </form>
+            </div>
         </div>
-      {% endif %}
-    {% endwith %}
-
-    <div class="card p-4 mb-4 shadow-sm" style="background: rgba(255, 193, 7, 0.1); border-radius: 12px; border: 1px solid rgba(255, 193, 7, 0.3);">
-        <h5 class="text-warning mb-3 fw-bold">Mode Test : Simulation Rapide</h5>
-        <p class="text-light small mb-3">Génère des scores aléatoires (0 à 5) pour tous les matchs en attente d'une journée spécifique. Idéal pour tester le système de points.</p>
-        <form method="POST" action="/randomize" class="d-flex align-items-center">
-            <select name="phase" class="form-select me-3 fw-bold" style="max-width: 250px; background-color: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2);">
-                <option value="Journée 1">Simuler la Journée 1</option>
-                <option value="Journée 2">Simuler la Journée 2</option>
-                <option value="Journée 3">Simuler la Journée 3</option>
-            </select>
-            <button type="submit" class="btn btn-warning fw-bold text-dark px-4 shadow">Générer les scores</button>
-        </form>
+        <div class="col-md-6">
+            <div class="card p-4 h-100 shadow-sm" style="background: rgba(220, 53, 69, 0.1); border-radius: 12px; border: 1px solid rgba(220, 53, 69, 0.3);">
+                <h5 class="text-danger mb-3 fw-bold">🏆 Générer les Phases Finales</h5>
+                <p class="text-light small mb-3">Calcule les 32 qualifiés à l'issue des groupes et génère l'arbre.</p>
+                <form method="POST" action="/generer_arbre" class="mt-auto">
+                    <button type="submit" class="btn btn-danger fw-bold text-white w-100">Créer l'Arborescence</button>
+                </form>
+            </div>
+        </div>
     </div>
 
-    <div class="card p-4 mb-5 shadow-sm" style="background: rgba(220, 53, 69, 0.1); border-radius: 12px; border: 1px solid rgba(220, 53, 69, 0.3);">
-        <h5 class="text-danger mb-3 fw-bold">Générer les Phases Finales</h5>
-        <p class="text-light small mb-3">Calcule automatiquement les 32 qualifiés (1ers, 2èmes et 8 meilleurs 3èmes) à l'issue des phases de groupes et génère l'arbre du tournoi.</p>
-        <form method="POST" action="/generer_arbre">
-            <button type="submit" class="btn btn-danger fw-bold text-white px-4 shadow">Créer l'Arborescence</button>
-        </form>
-    </div>
-
-    <div class="row">
-        <div class="col-md-12">
-            <h4 class="mb-4 text-muted">Gestion des résultats des matchs</h4>
+    <h4 class="mb-4 text-muted">Gestion des résultats</h4>
+    
+    <div class="accordion accordion-flush shadow-lg" id="accordionAdmin">
+        {% set ordre_phases = ['Journée 1', 'Journée 2', 'Journée 3', 'Seizièmes de finale', 'Huitièmes de finale', 'Quarts de finale', 'Demi-finales', 'Finale'] %}
+        
+        {% for phase_voulue in ordre_phases %}
+            {% set liste_matchs = matchs | selectattr('phase', 'equalto', phase_voulue) | list %}
             
-            {% for match in matchs %}
-            <div class="card p-4 mb-3 border-0 shadow-sm" style="background: rgba(255, 255, 255, 0.03); border-radius: 12px;">
-                <div class="row align-items-center">
-                    
-                    <div class="col-md-3">
-                        <span class="text-muted small d-block">{{ match.date }} - {{ match.heure }}</span>
-                        <span class="badge bg-secondary mt-1">{{ match.phase }}</span>
-                        {% if match.statut == 'Terminé' %}
-                            <span class="badge bg-success mt-1">Validé</span>
-                        {% else %}
-                            <span class="badge bg-warning text-dark mt-1">En attente</span>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-9">
-                        {% if match.statut == 'Terminé' %}
-                            <div class="d-flex align-items-center justify-content-center fw-bold text-white">
-                                <span class="fs-5 me-3">{{ match.eq1 }}</span>
-                                <img src="{{ match.logo1 }}" width="35" class="me-4" style="border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
-                                
-                                <span class="badge bg-dark px-3 py-2 fs-5">{{ match.vrai_score_eq1 }} - {{ match.vrai_score_eq2 }}</span>
-                                
-                                <img src="{{ match.logo2 }}" width="35" class="ms-4" style="border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
-                                <span class="fs-5 ms-3">{{ match.eq2 }}</span>
+            {% if liste_matchs|length > 0 %}
+            <div class="accordion-item mb-3 rounded-4 overflow-hidden" style="background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1);">
+                <h2 class="accordion-header">
+                    <button class="accordion-button {% if not loop.first %}collapsed{% endif %} fw-bold fs-5 text-white" 
+                            type="button" data-bs-toggle="collapse" data-bs-target="#adminCollapse{{ loop.index }}"
+                            style="background: linear-gradient(90deg, #5c162e, transparent); box-shadow: none;">
+                        {{ phase_voulue | upper }}
+                    </button>
+                </h2>
+                
+                <div id="adminCollapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#accordionAdmin">
+                    <div class="accordion-body p-3">
+                        {% for match in liste_matchs %}
+                            <div class="card mb-2 border-0 shadow-sm" style="background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                <div class="card-body py-2 px-3 d-flex align-items-center justify-content-between">
+                                    
+                                    <div style="width: 20%; border-right: 1px solid rgba(255,255,255,0.1);">
+                                        <span class="text-light opacity-50 small d-block">{{ match.date }}</span>
+                                        <span class="fw-bold text-danger">{{ match.heure }}</span>
+                                    </div>
+                                    
+                                    {% if match.statut == 'Terminé' %}
+                                        <div class="d-flex align-items-center justify-content-center flex-grow-1">
+                                            <span class="fw-bold text-white fs-5 me-3 text-end" style="width: 150px;">{{ match.eq1 }}</span>
+                                            <img src="{{ match.logo1 }}" width="25" class="me-3 rounded">
+                                            <span class="badge bg-danger fs-5 px-3 py-1">{{ match.vrai_score_eq1 }} - {{ match.vrai_score_eq2 }}</span>
+                                            <img src="{{ match.logo2 }}" width="25" class="ms-3 rounded">
+                                            <span class="fw-bold text-white fs-5 ms-3 text-start" style="width: 150px;">{{ match.eq2 }}</span>
+                                        </div>
+                                        <div style="width: 80px;" class="text-end">
+                                            <span class="badge bg-success">Validé</span>
+                                        </div>
+                                    {% else %}
+                                        <form method="POST" action="/admin" class="d-flex align-items-center justify-content-between flex-grow-1 m-0 ps-3">
+                                            <input type="hidden" name="match_id" value="{{ match.id }}">
+                                            
+                                            <div class="d-flex align-items-center justify-content-end" style="width: 35%;">
+                                                <span class="fw-bold text-white fs-5 me-2 text-truncate text-end" style="max-width: 120px;">{{ match.eq1 }}</span>
+                                                <img src="{{ match.logo1 }}" width="25" class="rounded">
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-center px-2" style="width: 20%;">
+                                                <input type="number" name="vrai_score1" class="form-control text-center p-1" style="width: 45px; height: 30px;" required>
+                                                <span class="text-white mx-1">-</span>
+                                                <input type="number" name="vrai_score2" class="form-control text-center p-1" style="width: 45px; height: 30px;" required>
+                                            </div>
+                                            
+                                            <div class="d-flex align-items-center justify-content-start" style="width: 35%;">
+                                                <img src="{{ match.logo2 }}" width="25" class="rounded">
+                                                <span class="fw-bold text-white fs-5 ms-2 text-truncate text-start" style="max-width: 120px;">{{ match.eq2 }}</span>
+                                            </div>
+                                            
+                                            <div class="text-end" style="width: 10%;">
+                                                <button type="submit" class="btn btn-danger btn-sm fw-bold">Valider</button>
+                                            </div>
+                                        </form>
+                                    {% endif %}
+                                </div>
                             </div>
-                        {% else %}
-                            <form method="POST" action="/admin" class="d-flex align-items-center justify-content-between w-100">
-                                <input type="hidden" name="match_id" value="{{ match.id }}">
-                                
-                                <div class="d-flex align-items-center justify-content-end text-white" style="width: 30%;">
-                                    <span class="fw-bold fs-5 me-3">{{ match.eq1 }}</span>
-                                    <img src="{{ match.logo1 }}" width="35" style="border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
-                                </div>
-                                
-                                <div class="d-flex align-items-center justify-content-center">
-                                    <input type="number" name="vrai_score1" class="form-control text-center mx-2 fw-bold" style="width: 70px; background-color: #f4f6f8;" min="0" required>
-                                    <span class="fs-4 text-white mx-2">-</span>
-                                    <input type="number" name="vrai_score2" class="form-control text-center mx-2 fw-bold" style="width: 70px; background-color: #f4f6f8;" min="0" required>
-                                </div>
-                                
-                                <div class="d-flex align-items-center justify-content-start text-white" style="width: 30%;">
-                                    <img src="{{ match.logo2 }}" width="35" style="border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
-                                    <span class="fw-bold fs-5 ms-3">{{ match.eq2 }}</span>
-                                </div>
-                                
-                                <button type="submit" class="btn btn-danger fw-bold shadow-sm px-4">Valider le score</button>
-                            </form>
-                        {% endif %}
+                        {% endfor %}
                     </div>
-
                 </div>
             </div>
-            {% else %}
-            <div class="alert alert-info">Aucun match enregistré dans le système.</div>
-            {% endfor %}
-        </div>
+            {% endif %}
+        {% endfor %}
     </div>
 </div>
+
+<style>
+    .accordion-button::after { filter: invert(1) grayscale(100%) brightness(200%); }
+    .accordion-button:not(.collapsed) { color: #fff; background-color: transparent; box-shadow: none; }
+</style>
 {% endblock %}
