@@ -3,7 +3,7 @@
 
 <div class="container mt-5 mb-5" style="min-height: calc(100vh - 150px);">
     
-    <div class="text-center mb-5 p-5" style="background: rgba(255,255,255,0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+    <div class="text-center mb-5 p-5" style="background: rgba(255,255,255,0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px;">
         <h1 class="fw-bold text-white display-4" style="letter-spacing: -1px;">Calendrier de la compétition</h1>
         <p class="text-light opacity-75 fs-5 mt-3">Toutes les rencontres, de la phase de groupes à la grande Finale.</p>
     </div>
@@ -29,44 +29,44 @@
                 </h2>
                 
                 <div id="collapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#accordionMatchs">
-                    <div class="accordion-body p-4">
+                    <div class="accordion-body p-3">
                         
                         {% for match in liste_matchs %}
                         {% set is_poule = ('Journée' in match.phase) %}
                         
-                        <div class="card mb-3 border-0 shadow-sm" style="background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(5px); border-radius: 12px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'">
-                            <div class="card-body py-3 px-4 d-flex align-items-center justify-content-between">
+                        <div class="card mb-2 border-0 shadow-sm" style="background: rgba(0, 0, 0, 0.3); border-radius: 12px;">
+                            <div class="card-body py-2 px-4 d-flex align-items-center justify-content-between">
                                 
-                                <div style="width: 15%; border-right: 1px solid rgba(255,255,255,0.1);">
+                                <div style="width: 20%; border-right: 1px solid rgba(255,255,255,0.1);">
                                     <div class="text-muted small fw-bold">{{ match.date }}</div>
                                     <span class="fw-bold fs-5" style="color: #4facfe;">{{ match.heure }}</span>
                                 </div>
                                 
-                                <div class="d-flex justify-content-end align-items-center" style="width: 35%;">
-                                    {% if is_poule %}
-                                        <span class="fw-bold text-white fs-5 me-3">{{ match.eq1 }}</span>
-                                        <img src="{{ match.logo1 }}" width="35" style="border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
+                                <div class="d-flex justify-content-end align-items-center" style="width: 30%;">
+                                    {% if is_poule or match.eq1 != 'À définir' %}
+                                        <span class="fw-bold text-white fs-5 me-2 text-truncate text-end" style="max-width: 180px;" title="{{ match.eq1 }}">{{ match.eq1 }}</span>
+                                        <img src="{{ match.logo1 }}" width="30" height="20" style="border-radius: 3px; object-fit: cover; flex-shrink: 0;">
                                     {% else %}
-                                        <span class="fw-bold text-muted fs-5 me-3 fst-italic">À définir</span>
+                                        <span class="fw-bold text-muted fs-5 me-2 fst-italic">À définir</span>
                                         <span class="fs-4">❓</span>
                                     {% endif %}
                                 </div>
                                 
-                                <div class="text-center" style="width: 15%;">
+                                <div class="text-center mx-2" style="width: 20%;">
                                     {% if match.statut == 'Terminé' %}
-                                        <span class="badge bg-danger fs-5 px-3 py-2 shadow">{{ match.vrai_score_eq1 }} - {{ match.vrai_score_eq2 }}</span>
+                                        <span class="badge bg-danger fs-5 px-3 py-1 shadow">{{ match.vrai_score_eq1 }} - {{ match.vrai_score_eq2 }}</span>
                                     {% else %}
-                                        <span class="badge px-3 py-2" style="background: rgba(255,255,255,0.1); color: #fff;">VS</span>
+                                        <span class="badge px-3 py-1" style="background: rgba(255,255,255,0.1); color: #fff;">VS</span>
                                     {% endif %}
                                 </div>
                                 
-                                <div class="d-flex justify-content-start align-items-center" style="width: 35%;">
-                                    {% if is_poule %}
-                                        <img src="{{ match.logo2 }}" width="35" style="border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
-                                        <span class="fw-bold text-white fs-5 ms-3">{{ match.eq2 }}</span>
+                                <div class="d-flex justify-content-start align-items-center" style="width: 30%;">
+                                    {% if is_poule or match.eq2 != 'À définir' %}
+                                        <img src="{{ match.logo2 }}" width="30" height="20" style="border-radius: 3px; object-fit: cover; flex-shrink: 0;">
+                                        <span class="fw-bold text-white fs-5 ms-2 text-truncate text-start" style="max-width: 180px;" title="{{ match.eq2 }}">{{ match.eq2 }}</span>
                                     {% else %}
                                         <span class="fs-4">❓</span>
-                                        <span class="fw-bold text-muted fs-5 ms-3 fst-italic">À définir</span>
+                                        <span class="fw-bold text-muted fs-5 ms-2 fst-italic">À définir</span>
                                     {% endif %}
                                 </div>
 
@@ -84,14 +84,8 @@
 </div>
 
 <style>
-    .accordion-button::after {
-        filter: invert(1) grayscale(100%) brightness(200%);
-    }
-    .accordion-button:not(.collapsed) {
-        color: #fff;
-        background-color: transparent;
-        box-shadow: none;
-    }
+    .accordion-button::after { filter: invert(1) grayscale(100%) brightness(200%); }
+    .accordion-button:not(.collapsed) { color: #fff; background-color: transparent; box-shadow: none; }
 </style>
 
 {% endblock %}
