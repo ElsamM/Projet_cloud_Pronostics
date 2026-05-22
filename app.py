@@ -23,7 +23,6 @@ DRAPEAUX = {
     "Angleterre": "https://flagcdn.com/w80/gb-eng.png", "Croatie": "https://flagcdn.com/w80/hr.png", "Ghana": "https://flagcdn.com/w80/gh.png", "Panamá": "https://flagcdn.com/w80/pa.png"
 }
 
-# LES 12 VRAIS GROUPES OFFICIELS
 GROUPES_FIFA = {
     'Groupe A': ['Mexique', 'Afrique du Sud', 'République de Corée', 'Tchéquie'],
     'Groupe B': ['Canada', 'Bosnie-et-Herzégovine', 'Qatar', 'Suisse'],
@@ -110,13 +109,12 @@ def dashboard():
         score1, score2 = request.form['score1'], request.form['score2']
         existant = conn.execute('SELECT id FROM Pronostics WHERE id_utilisateur = ? AND id_match = ?', (user_id, match_id)).fetchone()
         if existant:
-            conn.execute('UPDATE Pronostics SET prono_score_eq1 = ?, prono_score_eq2 = ? WHERE id = ?', (score1, score2, existant['id']))       
+            conn.execute('UPDATE Pronostics SET prono_score_eq1 = ?, prono_score_eq2 = ? WHERE id = ?', (score1, score2, existant['id']))      
         else:
             conn.execute('INSERT INTO Pronostics (id_utilisateur, id_match, prono_score_eq1, prono_score_eq2) VALUES (?, ?, ?, ?)', (user_id, match_id, score1, score2))
         conn.commit()
         flash("Pronostic enregistré avec succès !", "success")
         return redirect(url_for('dashboard'))
-        
         
     unlocked = {
         'huitiemes': conn.execute("SELECT count(*) as c FROM Matchs WHERE phase LIKE '%Journée%' AND statut != 'Terminé'").fetchone()['c'] == 0,
@@ -166,63 +164,6 @@ def ranking():
     conn.close()
     return render_template('ranking.html', users=users)
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
-
-@app.route('/admin', methods=['GET', 'POST'])
-def admin():
-    if 'user_id' not in session or session.get('email') != 'admin@esme.fr':
-        flash("Accès interdit. Vous devez être administrateur.")
-        return redirect(url_for('dashboard'))
-        
-    conn = get_db_connection()
-    if request.method == 'POST':
-        match_id = request.form['match_id']
-        vrai_s1 = int(request.form['vrai_score1'])
-        vrai_s2 = int(request.form['vrai_score2'])
-        
-        conn.execute("UPDATE Matchs SET vrai_score_eq1 = ?, vrai_score_eq2 = ?, statut = 'Terminé' WHERE id = ?", (vrai_s1, vrai_s2, match_id))
-        
-        pronos = conn.execute('SELECT * FROM Pronostics WHERE id_match = ?', (match_id,)).fetchall()
-        for prono in pronos:
-            p_s1, p_s2 = prono['prono_score_eq1'], prono['prono_score_eq2']
-            points = 0
-            if p_s1 == vrai_s1 and p_s2 == vrai_s2: points = 3
-            elif (vrai_s1 > vrai_s2 and p_s1 > p_s2) or (vrai_s1 < vrai_s2 and p_s1 < p_s2) or (vrai_s1 == vrai_s2 and p_s1 == p_s2): points = 1
-            
-            conn.execute('UPDATE Pronostics SET points_obtenus = ? WHERE id = ?', (points, prono['id']))
-            totaux = conn.execute('SELECT SUM(points_obtenus) as total FROM Pronostics WHERE id_utilisateur = ?', (prono['id_utilisateur'],)).fetchone()
-            nouveau_total = totaux['total'] if totaux['total'] is not None else 0
-            conn.execute('UPDATE Utilisateurs SET points_totaux = ? WHERE id = ?', (nouveau_total, prono['id_utilisateur']))
-            avancer_tournoi(conn)
-            
-        conn.commit()
-        flash("Match validé ! Les points des joueurs ont été mis à jour.")
-        return redirect(url_for('admin'))
-
-    matchs = conn.execute('SELECT * FROM Matchs').fetchall()
-    conn.close()
-    return render_template('admin.html', matchs=matchs)
-
-@app.route('/randomize', methods=['POST'])
-def randomize():
-    if 'user_id' not in session: return redirect(url_for('login'))
-    phase = request.form.get('phase')
-    conn = get_db_connection()
-    matchs = conn.execute('SELECT id FROM Matchs WHERE phase = ? AND statut != "Terminé"', (phase,)).fetchall()
-    
-    for m in matchs:
-        score1 = random.randint(0, 5)
-        score2 = random.randint(0, 5)
-        conn.execute("UPDATE Matchs SET vrai_score_eq1 = ?, vrai_score_eq2 = ?, statut = 'Terminé' WHERE id = ?", (score1, score2, m['id']))
-        
-    conn.commit()
-    conn.close()
-    flash(f"Scores générés aléatoirement pour la {phase} !", "success")
-    return redirect(url_for('admin'))
-
 @app.route('/groupes')
 def groupes():
     conn = get_db_connection()
@@ -260,6 +201,83 @@ def groupes():
 
     return render_template('groupes.html', classement=classement_final, matchs=tous_les_matchs)
 
+# ----- LES ROUTES QUI AVAIENT DISPARU SONT ICI -----
+@app.route('/profil')
+def profil():
+    if 'user_id' not in session: return redirect(url_for('login'))
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM Utilisateurs WHERE id = ?', (session['user_id'],)).fetchone()
+    conn.close()
+    return render_template('profil.html', user=user)
+
+@app.route('/preferences')
+def preferences():
+    if 'user_id' not in session: return redirect(url_for('login'))
+    return render_template('preferences.html')
+
+@app.route('/reglement')
+def reglement(): 
+    return render_template('reglement.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+# ---------------------------------------------------
+
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    if 'user_id' not in session or session.get('email') != 'admin@esme.fr':
+        flash("Accès interdit. Vous devez être administrateur.")
+        return redirect(url_for('dashboard'))
+        
+    conn = get_db_connection()
+    if request.method == 'POST':
+        match_id = request.form['match_id']
+        vrai_s1 = int(request.form['vrai_score1'])
+        vrai_s2 = int(request.form['vrai_score2'])
+        
+        conn.execute("UPDATE Matchs SET vrai_score_eq1 = ?, vrai_score_eq2 = ?, statut = 'Terminé' WHERE id = ?", (vrai_s1, vrai_s2, match_id))
+        
+        pronos = conn.execute('SELECT * FROM Pronostics WHERE id_match = ?', (match_id,)).fetchall()
+        for prono in pronos:
+            p_s1, p_s2 = prono['prono_score_eq1'], prono['prono_score_eq2']
+            points = 0
+            if p_s1 == vrai_s1 and p_s2 == vrai_s2: points = 3
+            elif (vrai_s1 > vrai_s2 and p_s1 > p_s2) or (vrai_s1 < vrai_s2 and p_s1 < p_s2) or (vrai_s1 == vrai_s2 and p_s1 == p_s2): points = 1
+            
+            conn.execute('UPDATE Pronostics SET points_obtenus = ? WHERE id = ?', (points, prono['id']))
+            totaux = conn.execute('SELECT SUM(points_obtenus) as total FROM Pronostics WHERE id_utilisateur = ?', (prono['id_utilisateur'],)).fetchone()
+            nouveau_total = totaux['total'] if totaux['total'] is not None else 0
+            conn.execute('UPDATE Utilisateurs SET points_totaux = ? WHERE id = ?', (nouveau_total, prono['id_utilisateur']))
+            
+        avancer_tournoi(conn)
+        conn.commit()
+        flash("Match validé ! Les points des joueurs ont été mis à jour.")
+        return redirect(url_for('admin'))
+
+    matchs = conn.execute('SELECT * FROM Matchs').fetchall()
+    conn.close()
+    return render_template('admin.html', matchs=matchs)
+
+@app.route('/randomize', methods=['POST'])
+def randomize():
+    if 'user_id' not in session: return redirect(url_for('login'))
+    phase = request.form.get('phase')
+    conn = get_db_connection()
+    matchs = conn.execute('SELECT id FROM Matchs WHERE phase = ? AND statut != "Terminé"', (phase,)).fetchall()
+    
+    for m in matchs:
+        score1 = random.randint(0, 5)
+        score2 = random.randint(0, 5)
+        conn.execute("UPDATE Matchs SET vrai_score_eq1 = ?, vrai_score_eq2 = ?, statut = 'Terminé' WHERE id = ?", (score1, score2, m['id']))
+        avancer_tournoi(conn)
+        
+    conn.commit()
+    conn.close()
+    flash(f"Scores générés aléatoirement pour la {phase} !", "success")
+    return redirect(url_for('admin'))
+
 def avancer_tournoi(conn):
     # 1. Vérifier si les 72 matchs de poules sont terminés
     poules_terminees = conn.execute("SELECT count(*) as c FROM Matchs WHERE id <= 72 AND statut != 'Terminé'").fetchone()['c'] == 0
@@ -284,7 +302,7 @@ def avancer_tournoi(conn):
                 eqs.sort(key=lambda x: (x['pts'], x['diff'], x['bp']), reverse=True)
                 les_32_equipes.extend(eqs[:2]) # 1ers et 2èmes
                 if grp in ['Groupe A', 'Groupe B', 'Groupe C', 'Groupe D', 'Groupe E', 'Groupe F', 'Groupe G', 'Groupe H']:
-                    les_32_equipes.append(eqs[2]) # Les meilleurs 3èmes simplifiés
+                    les_32_equipes.append(eqs[2]) # Les meilleurs 3èmes
             
             random.shuffle(les_32_equipes) # Tirage au sort pour remplir l'arbre
             match_id = 73
@@ -307,7 +325,6 @@ def avancer_tournoi(conn):
     
     matchs_termines = conn.execute("SELECT * FROM Matchs WHERE id >= 73 AND statut = 'Terminé'").fetchall()
     for m in matchs_termines:
-        # On évite les erreurs si le match n'a pas de nom
         if m['eq1'].startswith("Vainqueur") or m['eq1'].startswith("Perdant"): continue
         
         vainqueur = m['eq1'] if m['vrai_score_eq1'] > m['vrai_score_eq2'] else m['eq2']
@@ -327,9 +344,6 @@ def avancer_tournoi(conn):
         elif m['id'] == 102:
             conn.execute("UPDATE Matchs SET eq2 = ?, logo2 = ? WHERE id = 104", (vainqueur, logo_vainqueur))
             conn.execute("UPDATE Matchs SET eq2 = ?, logo2 = ? WHERE id = 103", (perdant, logo_perdant))
-            
-@app.route('/reglement')
-def reglement(): 
-    return render_template('reglement.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
