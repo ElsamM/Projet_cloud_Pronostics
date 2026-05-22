@@ -196,6 +196,7 @@ def admin():
             totaux = conn.execute('SELECT SUM(points_obtenus) as total FROM Pronostics WHERE id_utilisateur = ?', (prono['id_utilisateur'],)).fetchone()
             nouveau_total = totaux['total'] if totaux['total'] is not None else 0
             conn.execute('UPDATE Utilisateurs SET points_totaux = ? WHERE id = ?', (nouveau_total, prono['id_utilisateur']))
+            avancer_tournoi(conn)
             
         conn.commit()
         flash("Match validé ! Les points des joueurs ont été mis à jour.")
@@ -259,83 +260,72 @@ def groupes():
 
     return render_template('groupes.html', classement=classement_final, matchs=tous_les_matchs)
 
-@app.route('/profil')
-def profil():
-    if 'user_id' not in session: return redirect(url_for('login'))
-    conn = get_db_connection()
-    user = conn.execute('SELECT * FROM Utilisateurs WHERE id = ?', (session['user_id'],)).fetchone()
-    conn.close()
-    return render_template('profil.html', user=user)
+def avancer_tournoi(conn):
+    # 1. Vérifier si les 72 matchs de poules sont terminés
+    poules_terminees = conn.execute("SELECT count(*) as c FROM Matchs WHERE id <= 72 AND statut != 'Terminé'").fetchone()['c'] == 0
+    if poules_terminees:
+        # Vérifier si on a déjà placé les équipes dans les seizièmes
+        m73 = conn.execute("SELECT eq1 FROM Matchs WHERE id = 73").fetchone()
+        if m73 and "Deuxième" in m73['eq1']:
+            stats = {eq: {'nom': eq, 'pts': 0, 'diff': 0, 'bp': 0, 'logo': DRAPEAUX.get(eq, "https://flagcdn.com/w80/un.png")} for eq in DRAPEAUX.keys()}
+            matchs_poules = conn.execute("SELECT * FROM Matchs WHERE id <= 72 AND statut = 'Terminé'").fetchall()
+            for m in matchs_poules:
+                sc1, sc2 = m['vrai_score_eq1'], m['vrai_score_eq2']
+                if m['eq1'] in stats and m['eq2'] in stats:
+                    stats[m['eq1']]['bp'] += sc1; stats[m['eq1']]['diff'] += (sc1 - sc2)
+                    stats[m['eq2']]['bp'] += sc2; stats[m['eq2']]['diff'] += (sc2 - sc1)
+                    if sc1 > sc2: stats[m['eq1']]['pts'] += 3
+                    elif sc1 < sc2: stats[m['eq2']]['pts'] += 3
+                    else: stats[m['eq1']]['pts'] += 1; stats[m['eq2']]['pts'] += 1
+            
+            les_32_equipes = []
+            for grp, equipes in GROUPES_FIFA.items():
+                eqs = [stats[eq] for eq in equipes]
+                eqs.sort(key=lambda x: (x['pts'], x['diff'], x['bp']), reverse=True)
+                les_32_equipes.extend(eqs[:2]) # 1ers et 2èmes
+                if grp in ['Groupe A', 'Groupe B', 'Groupe C', 'Groupe D', 'Groupe E', 'Groupe F', 'Groupe G', 'Groupe H']:
+                    les_32_equipes.append(eqs[2]) # Les meilleurs 3èmes simplifiés
+            
+            random.shuffle(les_32_equipes) # Tirage au sort pour remplir l'arbre
+            match_id = 73
+            for i in range(0, 32, 2):
+                eqA, eqB = les_32_equipes[i], les_32_equipes[i+1]
+                conn.execute("UPDATE Matchs SET eq1 = ?, logo1 = ?, eq2 = ?, logo2 = ? WHERE id = ?", 
+                             (eqA['nom'], eqA['logo'], eqB['nom'], eqB['logo'], match_id))
+                match_id += 1
 
-@app.route('/preferences')
-def preferences():
-    if 'user_id' not in session: return redirect(url_for('login'))
-    return render_template('preferences.html')
-
-@app.route('/reglement')
-def reglement(): return render_template('reglement.html')
-
-@app.route('/generer_arbre', methods=['POST'])
-def generer_arbre():
-    if 'user_id' not in session or session.get('email') != 'admin@esme.fr':
-        return redirect(url_for('dashboard'))
+    # 2. Propagation automatique des Vainqueurs
+    progression = {
+        74: (89, 'eq1'), 77: (89, 'eq2'), 73: (90, 'eq1'), 75: (90, 'eq2'),
+        76: (91, 'eq1'), 78: (91, 'eq2'), 79: (92, 'eq1'), 80: (92, 'eq2'),
+        83: (93, 'eq1'), 84: (93, 'eq2'), 81: (94, 'eq1'), 82: (94, 'eq2'),
+        86: (95, 'eq1'), 88: (95, 'eq2'), 85: (96, 'eq1'), 87: (96, 'eq2'),
+        89: (97, 'eq1'), 90: (97, 'eq2'), 93: (98, 'eq1'), 94: (98, 'eq2'),
+        91: (99, 'eq1'), 92: (99, 'eq2'), 95: (100, 'eq1'), 96: (100, 'eq2'),
+        97: (101, 'eq1'), 98: (101, 'eq2'), 99: (102, 'eq1'), 100: (102, 'eq2')
+    }
+    
+    matchs_termines = conn.execute("SELECT * FROM Matchs WHERE id >= 73 AND statut = 'Terminé'").fetchall()
+    for m in matchs_termines:
+        # On évite les erreurs si le match n'a pas de nom
+        if m['eq1'].startswith("Vainqueur") or m['eq1'].startswith("Perdant"): continue
         
-    conn = get_db_connection()
-    matchs = conn.execute("SELECT * FROM Matchs WHERE statut = 'Terminé' AND phase LIKE 'Journée%'").fetchall()
-    
-    stats = {eq: {'nom': eq, 'pts': 0, 'diff': 0, 'bp': 0, 'logo': DRAPEAUX.get(eq, "https://flagcdn.com/w80/un.png")} 
-             for equipes in GROUPES_FIFA.values() for eq in equipes}
-             
-    for m in matchs:
-        eq1, eq2, sc1, sc2 = m['eq1'], m['eq2'], m['vrai_score_eq1'], m['vrai_score_eq2']
-        if sc1 is not None and sc2 is not None:
-            if eq1 in stats: stats[eq1]['bp'] += sc1; stats[eq1]['diff'] += (sc1 - sc2)
-            if eq2 in stats: stats[eq2]['bp'] += sc2; stats[eq2]['diff'] += (sc2 - sc1)
-            if sc1 > sc2:
-                if eq1 in stats: stats[eq1]['pts'] += 3
-            elif sc1 < sc2:
-                if eq2 in stats: stats[eq2]['pts'] += 3
-            else:
-                if eq1 in stats: stats[eq1]['pts'] += 1
-                if eq2 in stats: stats[eq2]['pts'] += 1
-
-    qualifies_directs = []
-    tous_les_troisiemes = []
-    
-    for grp, equipes in GROUPES_FIFA.items():
-        eqs = [stats[eq] for eq in equipes]
-        eqs.sort(key=lambda x: (x['pts'], x['diff'], x['bp']), reverse=True)
-        qualifies_directs.extend(eqs[:2])
-        tous_les_troisiemes.append(eqs[2])
+        vainqueur = m['eq1'] if m['vrai_score_eq1'] > m['vrai_score_eq2'] else m['eq2']
+        logo_vainqueur = m['logo1'] if m['vrai_score_eq1'] > m['vrai_score_eq2'] else m['logo2']
+        perdant = m['eq2'] if m['vrai_score_eq1'] > m['vrai_score_eq2'] else m['eq1']
+        logo_perdant = m['logo2'] if m['vrai_score_eq1'] > m['vrai_score_eq2'] else m['logo1']
         
-    tous_les_troisiemes.sort(key=lambda x: (x['pts'], x['diff'], x['bp']), reverse=True)
-    meilleurs_troisiemes = tous_les_troisiemes[:8]
-    
-    les_32_equipes = qualifies_directs + meilleurs_troisiemes
-    random.shuffle(les_32_equipes)
-
-    conn.execute("DELETE FROM Matchs WHERE phase NOT LIKE 'Journée%'")
-    
-    for i in range(0, 32, 2):
-        eqA, eqB = les_32_equipes[i], les_32_equipes[i+1]
-        conn.execute('''
-            INSERT INTO Matchs (phase, date, heure, eq1, logo1, eq2, logo2, statut)
-            VALUES (?, 'À définir', 'À définir', ?, ?, ?, ?, 'En attente')
-        ''', ("Seizièmes de finale", eqA['nom'], eqA['logo'], eqB['nom'], eqB['logo']))
+        if m['id'] in progression:
+            cible_id, cible_eq = progression[m['id']]
+            if cible_eq == 'eq1': conn.execute("UPDATE Matchs SET eq1 = ?, logo1 = ? WHERE id = ?", (vainqueur, logo_vainqueur, cible_id))
+            else: conn.execute("UPDATE Matchs SET eq2 = ?, logo2 = ? WHERE id = ?", (vainqueur, logo_vainqueur, cible_id))
         
-    phases_futures = [("Huitièmes de finale", 8), ("Quarts de finale", 4), ("Demi-finales", 2), ("Finale", 1)]
-    for phase, nb_matchs in phases_futures:
-        for _ in range(nb_matchs):
-             conn.execute('''
-                INSERT INTO Matchs (phase, date, heure, eq1, logo1, eq2, logo2, statut)
-                VALUES (?, 'À définir', 'À définir', 'À définir', 'https://flagcdn.com/w80/un.png', 'À définir', 'https://flagcdn.com/w80/un.png', 'En attente')
-            ''', (phase,))
-
-    conn.commit()
-    conn.close()
-    
-    flash("Arbre des phases finales généré avec les 32 qualifiés !", "success")
-    return redirect(url_for('admin'))
-
+        # Gestion des finales
+        if m['id'] == 101:
+            conn.execute("UPDATE Matchs SET eq1 = ?, logo1 = ? WHERE id = 104", (vainqueur, logo_vainqueur))
+            conn.execute("UPDATE Matchs SET eq1 = ?, logo1 = ? WHERE id = 103", (perdant, logo_perdant))
+        elif m['id'] == 102:
+            conn.execute("UPDATE Matchs SET eq2 = ?, logo2 = ? WHERE id = 104", (vainqueur, logo_vainqueur))
+            conn.execute("UPDATE Matchs SET eq2 = ?, logo2 = ? WHERE id = 103", (perdant, logo_perdant))
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
