@@ -327,5 +327,9 @@ def avancer_tournoi(conn):
         elif m['id'] == 102:
             conn.execute("UPDATE Matchs SET eq2 = ?, logo2 = ? WHERE id = 104", (vainqueur, logo_vainqueur))
             conn.execute("UPDATE Matchs SET eq2 = ?, logo2 = ? WHERE id = 103", (perdant, logo_perdant))
+            
+@app.route('/reglement')
+def reglement(): 
+    return render_template('reglement.html')
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
