@@ -29,7 +29,7 @@
         
         <div class="col-md-6">
             <div class="card p-4 h-100 shadow-sm" style="background: rgba(220, 53, 69, 0.15); border-radius: 12px; border: 1px solid rgba(220, 53, 69, 0.4);">
-                <h5 class="text-danger mb-3 fw-bold">⚠️ Réinitialisation de la Compétition</h5>
+                <h5 class="text-danger mb-3 fw-bold"> Réinitialisation de la Compétition</h5>
                 <p class="text-light small mb-3">Remet l'intégralité du tournoi à zéro (efface les pronostics et restaure l'arbre d'origine).</p>
                 
                 <form method="POST" action="/admin/reset" onsubmit="return confirm('Êtes-vous sûr de vouloir réinitialiser la compétition ? Cette action est irréversible.');" class="mt-auto">
@@ -41,7 +41,7 @@
                         </select>
                     </div>
                     <button type="submit" class="btn btn-danger fw-bold text-white w-100 py-2 shadow-sm" style="border-radius: 8px;">
-                        🔄 Réinitialiser tout le site
+                        Réinitialiser tout le site
                     </button>
                 </form>
             </div>
@@ -101,7 +101,7 @@
                                                     <img src="{{ match.logo1 }}" width="25" class="rounded">
                                                 {% else %}
                                                     <span class="fw-bold text-muted fs-6 me-2 fst-italic">À définir</span>
-                                                    <span class="fs-5">❓</span>
+                                                    
                                                 {% endif %}
                                             </div>
 
@@ -116,7 +116,7 @@
                                                     <img src="{{ match.logo2 }}" width="25" class="rounded">
                                                     <span class="fw-bold text-white fs-5 ms-2 text-truncate text-start" style="max-width: 120px;">{{ match.eq2 }}</span>
                                                 {% else %}
-                                                    <span class="fs-5">❓</span>
+                                                    
                                                     <span class="fw-bold text-muted fs-6 ms-2 fst-italic">À définir</span>
                                                 {% endif %}
                                             </div>
