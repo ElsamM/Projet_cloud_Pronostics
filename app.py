@@ -7,7 +7,6 @@ import random
 app = Flask(__name__)
 app.secret_key = 'projet_world_cup_2026_key'
 
-# LE NOUVEAU DICTIONNAIRE OFFICIEL DES 48 DRAPEAUX
 DRAPEAUX = {
     "Mexique": "https://flagcdn.com/w80/mx.png", "Afrique du Sud": "https://flagcdn.com/w80/za.png", "République de Corée": "https://flagcdn.com/w80/kr.png", "Tchéquie": "https://flagcdn.com/w80/cz.png",
     "Canada": "https://flagcdn.com/w80/ca.png", "Bosnie-et-Herzégovine": "https://flagcdn.com/w80/ba.png", "Qatar": "https://flagcdn.com/w80/qa.png", "Suisse": "https://flagcdn.com/w80/ch.png",
@@ -42,13 +41,6 @@ def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
     return conn
-
-def init_db():
-    if not os.path.exists('database.db'):
-        conn = get_db_connection()
-        with open('schema.sql', 'r', encoding='utf-8') as f:
-            conn.executescript(f.read())
-        conn.close()
 
 @app.route('/')
 def index():
@@ -116,10 +108,13 @@ def dashboard():
         flash("Pronostic enregistré avec succès !", "success")
         return redirect(url_for('dashboard'))
         
+    # CORRECTION DE LA LOGIQUE DES CADENAS : On débloque si le tour PRÉCÉDENT est terminé !
     unlocked = {
-        'huitiemes': conn.execute("SELECT count(*) as c FROM Matchs WHERE phase LIKE '%Journée%' AND statut != 'Terminé'").fetchone()['c'] == 0,
+        'seiziemes': conn.execute("SELECT count(*) as c FROM Matchs WHERE phase LIKE '%Journée%' AND statut != 'Terminé'").fetchone()['c'] == 0,
+        'huitiemes': conn.execute("SELECT count(*) as c FROM Matchs WHERE phase LIKE '%Seizièmes%' AND statut != 'Terminé'").fetchone()['c'] == 0,
         'quarts': conn.execute("SELECT count(*) as c FROM Matchs WHERE phase LIKE '%Huitièmes%' AND statut != 'Terminé'").fetchone()['c'] == 0,
         'demis': conn.execute("SELECT count(*) as c FROM Matchs WHERE phase LIKE '%Quarts%' AND statut != 'Terminé'").fetchone()['c'] == 0,
+        'petite': conn.execute("SELECT count(*) as c FROM Matchs WHERE phase LIKE '%Demi%' AND statut != 'Terminé'").fetchone()['c'] == 0,
         'finale': conn.execute("SELECT count(*) as c FROM Matchs WHERE phase LIKE '%Demi%' AND statut != 'Terminé'").fetchone()['c'] == 0
     }
 
@@ -201,7 +196,6 @@ def groupes():
 
     return render_template('groupes.html', classement=classement_final, matchs=tous_les_matchs)
 
-# ----- LES ROUTES QUI AVAIENT DISPARU SONT ICI -----
 @app.route('/profil')
 def profil():
     if 'user_id' not in session: return redirect(url_for('login'))
@@ -223,12 +217,11 @@ def reglement():
 def logout():
     session.clear()
     return redirect(url_for('login'))
-# ---------------------------------------------------
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     if 'user_id' not in session or session.get('email') != 'admin@esme.fr':
-        flash("Accès interdit. Vous devez être administrateur.")
+        flash("Accès interdit.")
         return redirect(url_for('dashboard'))
         
     conn = get_db_connection()
@@ -253,7 +246,7 @@ def admin():
             
         avancer_tournoi(conn)
         conn.commit()
-        flash("Match validé ! Les points des joueurs ont été mis à jour.")
+        flash("Match validé ! L'arbre s'est mis à jour automatiquement.")
         return redirect(url_for('admin'))
 
     matchs = conn.execute('SELECT * FROM Matchs').fetchall()
@@ -279,12 +272,10 @@ def randomize():
     return redirect(url_for('admin'))
 
 def avancer_tournoi(conn):
-    # 1. Vérifier si les 72 matchs de poules sont terminés
     poules_terminees = conn.execute("SELECT count(*) as c FROM Matchs WHERE id <= 72 AND statut != 'Terminé'").fetchone()['c'] == 0
     if poules_terminees:
-        # Vérifier si on a déjà placé les équipes dans les seizièmes
         m73 = conn.execute("SELECT eq1 FROM Matchs WHERE id = 73").fetchone()
-        if m73 and "Deuxième" in m73['eq1']:
+        if m73 and ("Deuxième" in m73['eq1'] or "Premier" in m73['eq1']):
             stats = {eq: {'nom': eq, 'pts': 0, 'diff': 0, 'bp': 0, 'logo': DRAPEAUX.get(eq, "https://flagcdn.com/w80/un.png")} for eq in DRAPEAUX.keys()}
             matchs_poules = conn.execute("SELECT * FROM Matchs WHERE id <= 72 AND statut = 'Terminé'").fetchall()
             for m in matchs_poules:
@@ -300,11 +291,11 @@ def avancer_tournoi(conn):
             for grp, equipes in GROUPES_FIFA.items():
                 eqs = [stats[eq] for eq in equipes]
                 eqs.sort(key=lambda x: (x['pts'], x['diff'], x['bp']), reverse=True)
-                les_32_equipes.extend(eqs[:2]) # 1ers et 2èmes
+                les_32_equipes.extend(eqs[:2])
                 if grp in ['Groupe A', 'Groupe B', 'Groupe C', 'Groupe D', 'Groupe E', 'Groupe F', 'Groupe G', 'Groupe H']:
-                    les_32_equipes.append(eqs[2]) # Les meilleurs 3èmes
+                    les_32_equipes.append(eqs[2])
             
-            random.shuffle(les_32_equipes) # Tirage au sort pour remplir l'arbre
+            random.shuffle(les_32_equipes)
             match_id = 73
             for i in range(0, 32, 2):
                 eqA, eqB = les_32_equipes[i], les_32_equipes[i+1]
@@ -312,7 +303,7 @@ def avancer_tournoi(conn):
                              (eqA['nom'], eqA['logo'], eqB['nom'], eqB['logo'], match_id))
                 match_id += 1
 
-    # 2. Propagation automatique des Vainqueurs
+    # LE DICTIONNAIRE PARFAIT AVEC LES BONS IDs
     progression = {
         74: (89, 'eq1'), 77: (89, 'eq2'), 73: (90, 'eq1'), 75: (90, 'eq2'),
         76: (91, 'eq1'), 78: (91, 'eq2'), 79: (92, 'eq1'), 80: (92, 'eq2'),
@@ -325,7 +316,7 @@ def avancer_tournoi(conn):
     
     matchs_termines = conn.execute("SELECT * FROM Matchs WHERE id >= 73 AND statut = 'Terminé'").fetchall()
     for m in matchs_termines:
-        if m['eq1'].startswith("Vainqueur") or m['eq1'].startswith("Perdant"): continue
+        if m['eq1'].startswith("Vainqueur") or m['eq1'].startswith("Perdant") or "Groupe" in m['eq1']: continue
         
         vainqueur = m['eq1'] if m['vrai_score_eq1'] > m['vrai_score_eq2'] else m['eq2']
         logo_vainqueur = m['logo1'] if m['vrai_score_eq1'] > m['vrai_score_eq2'] else m['logo2']
@@ -337,7 +328,6 @@ def avancer_tournoi(conn):
             if cible_eq == 'eq1': conn.execute("UPDATE Matchs SET eq1 = ?, logo1 = ? WHERE id = ?", (vainqueur, logo_vainqueur, cible_id))
             else: conn.execute("UPDATE Matchs SET eq2 = ?, logo2 = ? WHERE id = ?", (vainqueur, logo_vainqueur, cible_id))
         
-        # Gestion des finales
         if m['id'] == 101:
             conn.execute("UPDATE Matchs SET eq1 = ?, logo1 = ? WHERE id = 104", (vainqueur, logo_vainqueur))
             conn.execute("UPDATE Matchs SET eq1 = ?, logo1 = ? WHERE id = 103", (perdant, logo_perdant))

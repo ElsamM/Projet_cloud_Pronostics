@@ -9,7 +9,7 @@
     <div class="row mb-5">
         <div class="col-md-6">
             <div class="card p-4 h-100 shadow-sm" style="background: rgba(255, 193, 7, 0.1); border-radius: 12px; border: 1px solid rgba(255, 193, 7, 0.3);">
-                <h5 class="text-warning mb-3 fw-bold">🎲 Mode Test : Simulation Rapide</h5>
+                <h5 class="text-warning mb-3 fw-bold">Mode Test : Simulation Rapide</h5>
                 <form method="POST" action="/randomize" class="d-flex flex-column gap-3">
                     <select name="phase" class="form-select fw-bold bg-dark text-white border-secondary">
                         <option value="Journée 1">Simuler la Journée 1</option>
@@ -19,27 +19,20 @@
                         <option value="Huitièmes de finale">Simuler les Huitièmes</option>
                         <option value="Quarts de finale">Simuler les Quarts</option>
                         <option value="Demi-finales">Simuler les Demis</option>
+                        <option value="Petite finale">Simuler la Petite finale</option>
                         <option value="Finale">Simuler la Finale</option>
                     </select>
                     <button type="submit" class="btn btn-warning fw-bold text-dark w-100">Générer les scores</button>
                 </form>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card p-4 h-100 shadow-sm" style="background: rgba(220, 53, 69, 0.1); border-radius: 12px; border: 1px solid rgba(220, 53, 69, 0.3);">
-                <h5 class="text-danger mb-3 fw-bold">🏆 Générer les Phases Finales</h5>
-                <p class="text-light small mb-3">Calcule les 32 qualifiés à l'issue des groupes et génère l'arbre.</p>
-                <form method="POST" action="/generer_arbre" class="mt-auto">
-                    <button type="submit" class="btn btn-danger fw-bold text-white w-100">Créer l'Arborescence</button>
-                </form>
-            </div>
-        </div>
     </div>
+        
 
     <h4 class="mb-4 text-muted">Gestion des résultats</h4>
     
     <div class="accordion accordion-flush shadow-lg" id="accordionAdmin">
-        {% set ordre_phases = ['Journée 1', 'Journée 2', 'Journée 3', 'Seizièmes de finale', 'Huitièmes de finale', 'Quarts de finale', 'Demi-finales', 'Finale'] %}
+        {% set ordre_phases = ['Journée 1', 'Journée 2', 'Journée 3', 'Seizièmes de finale', 'Huitièmes de finale', 'Quarts de finale', 'Demi-finales', 'Petite finale', 'Finale'] %}
         
         {% for phase_voulue in ordre_phases %}
             {% set liste_matchs = matchs | selectattr('phase', 'equalto', phase_voulue) | list %}

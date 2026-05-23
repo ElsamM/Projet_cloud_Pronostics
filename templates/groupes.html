@@ -81,7 +81,11 @@
                 {% for m in matchs if 'Huitièmes' in m.phase %}
                 <div class="card bg-dark border-secondary shadow-sm text-white p-2 text-center" style="font-size: 0.85rem;">
                     <div class="d-flex justify-content-between mb-1">
-                        <span>{{ m.eq1[:12] }}</span>
+                       {% if 'Groupe' in m.eq1 or 'Vainqueur' in m.eq1 or 'Perdant' in m.eq1 %}
+                            <span class="text-muted fst-italic">À définir</span>
+                        {% else %}
+                            <span><img src="{{ m.logo1 }}" width="15" class="me-1">{{ m.eq1[:12] }}</span>
+                        {% endif %}
                     </div>
                     <div class="d-flex justify-content-between">
                         <span>{{ m.eq2[:12] }}</span>

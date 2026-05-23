@@ -44,10 +44,12 @@
                             
                             {% for match in liste_matchs %}
                                 {% set is_locked = false %}
-                                {% if 'Seizièmes' in match.phase and not unlocked.huitiemes %} {% set is_locked = true %} {% endif %}
+                                {% if 'Seizièmes' in match.phase and not unlocked.seiziemes %} {% set is_locked = true %} {% endif %}
                                 {% if 'Huitièmes' in match.phase and not unlocked.quarts %} {% set is_locked = true %} {% endif %}
                                 {% if 'Quarts' in match.phase and not unlocked.demis %} {% set is_locked = true %} {% endif %}
                                 {% if 'Demi' in match.phase and not unlocked.finale %} {% set is_locked = true %} {% endif %}
+                                {% if 'Petite' in match.phase and not unlocked.petite %} {% set is_locked = true %} {% endif %}
+                                {% if 'Finale' in match.phase and not unlocked.finale %} {% set is_locked = true %} {% endif %}
 
                                 <div class="card mb-2 border-0 shadow-sm" style="background: rgba(0, 0, 0, 0.3); border-radius: 12px;">
                                     <div class="card-body py-2 px-3 d-flex align-items-center justify-content-between">
@@ -105,11 +107,11 @@
                                                         {% endif %}
                                                     {% elif match.points_obtenus is not none %}
                                                         {% if match.points_obtenus == 3 %}
-                                                            <span class="badge rounded-pill fw-bold shadow-sm" style="background-color: #488f61; color: white; padding: 8px 12px; font-size: 0.9rem;">+3 PTS</span>
+                                                            <span class="badge rounded-pill fw-bold shadow-sm" style="background-color: #28a745; color: white; padding: 8px 12px; font-size: 0.9rem;">+3 PTS</span>
                                                         {% elif match.points_obtenus == 1 %}
-                                                            <span class="badge rounded-pill fw-bold shadow-sm" style="background-color: #6bb9ed; color: #000; padding: 8px 12px; font-size: 0.9rem;">+1 PTS</span>
+                                                            <span class="badge rounded-pill fw-bold shadow-sm" style="background-color: #007bff; color: white; padding: 8px 12px; font-size: 0.9rem;">+1 PTS</span>
                                                         {% else %}
-                                                            <span class="badge rounded-pill fw-bold shadow-sm" style="background-color: #cc4d4d; color: white; padding: 8px 12px; font-size: 0.9rem;">0 PTS</span>
+                                                            <span class="badge rounded-pill fw-bold shadow-sm" style="background-color: #dc3545; color: white; padding: 8px 12px; font-size: 0.9rem;">0 PTS</span>
                                                         {% endif %}
                                                     {% endif %}
                                                 </div>
