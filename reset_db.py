@@ -15,7 +15,7 @@ with open('schema.sql', 'r', encoding='utf-8') as f:
 conn.execute('''
     INSERT INTO Utilisateurs (nom, prenom, pseudo, email, mot_de_passe_hash)
     VALUES (?, ?, ?, ?, ?)
-''', ('Admin', 'ESME', 'Admin', 'admin@esme.fr', generate_password_hash('admin123')))
+''', ('Admin', 'administration', 'Admin', 'admin@gmail.COM', generate_password_hash('admin123')))
 
 print("⚽ Création du calendrier COMPLET des 104 matchs...")
 conn.execute("DELETE FROM sqlite_sequence WHERE name='Matchs'")

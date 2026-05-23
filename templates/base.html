@@ -79,9 +79,9 @@
                     <ul class="dropdown-menu dropdown-menu-end shadow-lg mt-2" style="border-radius: 10px; background-color: #1f2833; z-index: 9999;">
                         <li><a class="dropdown-item text-light" href="{{ url_for('profil') }}">Mon Profil</a></li>
                         
-                        {% if session.get('email') == 'admin@esme.fr' %}
+                        {% if session.get('email') == 'admin@gmail.com' %}
                         <li><hr class="dropdown-divider border-secondary"></li>
-                        <li><a class="dropdown-item fw-bold text-warning" href="/admin">⚙️ Administration</a></li>
+                        <li><a class="dropdown-item fw-bold text-warning" href="/admin">Administration</a></li>
                         {% endif %}
                         
                         <li><hr class="dropdown-divider border-secondary"></li>

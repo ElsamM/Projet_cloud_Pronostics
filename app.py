@@ -155,7 +155,7 @@ def calendrier():
 @app.route('/ranking')
 def ranking():
     conn = get_db_connection()
-    users = conn.execute("SELECT nom, prenom, points_totaux FROM Utilisateurs WHERE email != 'admin@esme.fr' ORDER BY points_totaux DESC").fetchall()
+    users = conn.execute("SELECT nom, prenom, points_totaux FROM Utilisateurs WHERE email != 'admin@gmail.com' ORDER BY points_totaux DESC").fetchall()
     conn.close()
     return render_template('ranking.html', users=users)
 
@@ -220,7 +220,7 @@ def logout():
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
-    if 'user_id' not in session or session.get('email') != 'admin@esme.fr':
+    if 'user_id' not in session or session.get('email') != 'admin@gmail.com':
         flash("Accès interdit.")
         return redirect(url_for('dashboard'))
         
@@ -337,7 +337,7 @@ def avancer_tournoi(conn):
 
 @app.route('/admin/reset', methods=['POST'])
 def reset_competition():
-    if 'user_id' not in session or session.get('email') != 'admin@esme.fr':
+    if 'user_id' not in session or session.get('email') != 'admin@gmail.com':
         flash("Accès interdit.", "danger")
         return redirect(url_for('dashboard'))
         
@@ -357,7 +357,7 @@ def reset_competition():
         flash("Compétition réinitialisée ! Les joueurs ont été conservés et leurs points remis à 0.", "success")
     else:
         # On supprime tout le monde SAUF le compte administrateur principal
-        conn.execute("DELETE FROM Utilisateurs WHERE email != 'admin@esme.fr'")
+        conn.execute("DELETE FROM Utilisateurs WHERE email != 'admin@gmail.com'")
         flash("Compétition réinitialisée ! Tous les joueurs ont été supprimés du classement.", "success")
     
     # 3. Réinitialisation complète des 104 matchs à l'état d'origine
